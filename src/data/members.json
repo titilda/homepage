@@ -1,0 +1,79 @@
+[
+  {
+    "name": "Nadav Moscovici",
+    "description": "HCIDXR Student",
+    "image": "/images/nadav.png",
+    "links": {
+      "cv": "https://www.nadavmoscovici.com/files/nadav_moscovici_cv.pdf",
+      "website": "https://www.nadavmoscovici.com",
+      "github": "#",
+      "linkedin": "#"
+    }
+  }, 
+  {
+    "name": "Alessandro Modica",
+    "description": "Goth Baddies Rule",
+    "image": "/images/alessandro.png",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  },
+  {
+    "name": "Andrea Oggioni",
+    "description": "Non fatemi foto",
+    "image": "/images/andrea0.png",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  },
+  {
+    "name": "Andrea Lunghi",
+    "description": "Omen Nomen",
+    "image": "/images/andrea2.png",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  },
+  {
+    "name": "Joele Andrea Ortore",
+    "description": "Palla Nuoto",
+    "image": "/images/joele.png",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  },
+  {
+    "name": "Niccolo Papini",
+    "description": "The Monster",
+    "image": "/images/niccolo.png",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  }, 
+  {
+    "name": "Mattia Martinelli",
+    "description": "I will fuck your mom\n\nRAWRR",
+    "image": "#",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  }
+]
