@@ -230,7 +230,9 @@
               :alt="member.name" 
               class="member-image" 
             />
-            
+            <span class="member-info">
+              <h3>{{ member.name }}</h3>
+            </span>
             <div class="member-links-overlay">
               <div class="overlay-description">
                 <p>{{ member.description }}</p>
