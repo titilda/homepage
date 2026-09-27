@@ -1,35 +1,85 @@
 <script setup>
-  import { ref, computed, onMounted, onUnmounted } from 'vue'
+  import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
   import RippleBackground from './components/RippleBackground.vue'
   import SiteHeader from './components/SiteHeader.vue'
   import toolsData from './data/tools.json'
   import members from './data/members.json'
 
+  const OnDocumentLoad = () => {
+    window.scrollTo(0, 0)
+  }
+
   const scrollY = ref(0)
   const handleScroll = () => { scrollY.value = window.scrollY }
-  onMounted(() => window.addEventListener('scroll', handleScroll))
-  onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 
   const isModalOpen = ref(false)
 
-  const carouselRef = ref(null)
-  const scrollCarousel = (direction) => {
-    if (carouselRef.value) {
-      const scrollAmount = 320
-      carouselRef.value.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' })
-    }
-  }
+  const trackRef = ref(null)
+  const baseSpeed = 1
+  const maxSpeed = 12
+  const targetSpeed = ref(baseSpeed)
+  const currentSpeed = ref(baseSpeed)
+  const scrollDirection = ref(-1) //? -1 = scroll left, 1 = scroll right
+  let trackPosition = 0 
+  const cardWidthWithGap = 332 
+  let animationId = null
+
+  const hotToolsData = computed(() => toolsData.filter(tool => tool.hottest === true))
+  const shouldScroll = computed(() => hotToolsData.value.length > 3)
 
   const hottestTools = computed(() => {
-    const hotTools = toolsData.filter(tool => tool.hottest === true)
+    const hotTools = hotToolsData.value
     
-    if (hotTools.length > 5) {
-      return hotTools
-        .sort(() => 0.5 - Math.random()) 
-        .slice(0, 5)
+    if(!shouldScroll.value) return hotTools
+
+    const selected = hotTools.length > 5 
+      ? hotTools.sort(() => 0.5 - Math.random()).slice(0, 5) 
+      : hotTools
+    
+    return [...selected, ...selected, ...selected]
+  })
+
+  const accelerate = (dir) => {
+    scrollDirection.value = dir
+    targetSpeed.value = maxSpeed
+  }
+  const decelerate = () => {
+    targetSpeed.value = baseSpeed
+  }
+  const pauseTrack = () => {
+    targetSpeed.value = 0
+  }
+
+  const updateMarquee = () => {
+    if(!shouldScroll.value) return
+
+    currentSpeed.value += (targetSpeed.value - currentSpeed.value) * 0.05
+    trackPosition += currentSpeed.value * scrollDirection.value
+
+    const singleSetWidth = (hottestTools.value.length / 3) * cardWidthWithGap
+    
+    if (trackPosition <= -singleSetWidth) {
+      trackPosition += singleSetWidth
+    } else if (trackPosition >= 0) {
+      trackPosition -= singleSetWidth
     }
-    
-    return hotTools.slice(0, 5)
+
+    if (trackRef.value) {
+      trackRef.value.style.transform = `translateX(${trackPosition}px)`
+    }
+
+    animationId = requestAnimationFrame(updateMarquee)
+  }
+
+  onMounted(() => {
+    OnDocumentLoad()
+    window.addEventListener('scroll', handleScroll)
+    nextTick(() => { animationId = requestAnimationFrame(updateMarquee) })
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll)
+    cancelAnimationFrame(animationId)
   })
 </script>
 
@@ -62,28 +112,64 @@
 
       <section class="glass-section tools-section">
         <div class="hottest-tools-container">
-          <h2 class="section-title">Almost As Hot As You!</h2>
+          <div class="carousel-header">
+            <!-- Add Flame SVG Here -->
+            <h2 class="section-title">Almost As Hot As You!</h2>
+            <div class="carousel-controls" v-if="shouldScroll">
+              <!-- Mouse & Touch events bound to momentum functions -->
+              <button 
+                  class="carousel-control prev" 
+                  @mousedown="accelerate(1)" @mouseup="decelerate" @mouseleave="decelerate"
+                  @touchstart.prevent="accelerate(1)" @touchend.prevent="decelerate"
+                >&#8249;</button>
+                <button 
+                  class="carousel-control next" 
+                  @mousedown="accelerate(-1)" @mouseup="decelerate" @mouseleave="decelerate"
+                  @touchstart.prevent="accelerate(-1)" @touchend.prevent="decelerate"
+                >&#8250;</button>
+            </div>
+          </div>
 
-          <button class="carousel-control prev" @click="scrollCarousel(-1)">&#8249;</button>
-          <button class="carousel-control next" @click="scrollCarousel(1)">&#8250;</button>
-
-          <div class="carousel-wrapper" ref="carouselRef">
-            <component 
-              :is="tool.url ? 'a' : 'div'" 
-              v-for="tool in hottestTools" 
-              :key="tool.id"
-              :href="tool.url"
-              class="glass-card carousel-card" 
-              :class="tool.status === 'Live' ? 'active-tool' : 'locked-tool'"
+          <div class="marquee-viewport">
+            <div 
+              class="marquee-track" 
+              :class="{ 'is-static': !shouldScroll }"
+              ref="trackRef"
+              @mouseenter="pauseTrack" 
+              @mouseleave="decelerate"
             >
-              <div class="card-content">
-                <h3>{{ tool.name }}</h3>
-                <p>{{ tool.description }}</p>
+              <div 
+                v-for="(tool, index) in hottestTools" 
+                :key="`${tool.id}-${index}`"
+                class="glass-card vertical-card" 
+                :class="tool.status === 'Live' ? 'active-tool' : 'locked-tool'"
+              >
+                <div class="status-badge" :class="{ 'pending': tool.status !== 'Live' }">
+                  {{ tool.status }}
+                </div>
+                
+                <div class="card-content">
+                  <img 
+                    v-if="tool.logo && tool.logo !== '#'" 
+                    loading="lazy"
+                    :src="tool.logo.startsWith('/') ? tool.logo : '/' + tool.logo" 
+                    :alt="`${tool.name} logo`" 
+                    class="tool-logo" 
+                  />
+                  <h3>{{ tool.name }}</h3>
+                  <p>{{ tool.description }}</p>
+                </div>
+                
+                <a 
+                  v-if="tool.url && tool.status === 'Live'" 
+                  :href="tool.url" 
+                  target="_blank"
+                  class="card-action-btn"
+                >
+                  View Tool
+                </a>
               </div>
-              <div class="status-badge" :class="{ 'pending': tool.status !== 'Live' }">
-                {{ tool.status }}
-              </div>
-            </component>
+            </div>
           </div>
 
           <div class="see-all-wrapper">
@@ -104,15 +190,27 @@
                 v-for="tool in toolsData" 
                 :key="tool.id"
                 :href="tool.url"
-                class="glass-card" 
+                target="_blank"
+                class="glass-card horizontal-card" 
                 :class="tool.status === 'Live' ? 'active-tool' : 'locked-tool'"
               >
                 <div class="card-content">
+                  <img 
+                    v-if="tool.logo && tool.logo !== '#'" 
+                    loading="lazy"
+                    :src="tool.logo.startsWith('/') ? tool.logo : '/' + tool.logo" 
+                    :alt="`${tool.name} logo`" 
+                    class="tool-logo" 
+                  />
                   <h3>{{ tool.name }}</h3>
-                  <p>{{ tool.description }}</p>
+                  <!-- <p>{{ tool.description }}</p> -->
                 </div>
                 <div class="status-badge" :class="{ 'pending': tool.status !== 'Live' }">
                   {{ tool.status }}
+                </div>
+                
+                <div class="fly-in-text" v-if="tool.status === 'Live'">
+                  View Resource &raquo;
                 </div>
               </component>
             </div>
@@ -127,6 +225,7 @@
           <div v-for="member in members" :key="member.name" class="member-card">
 
             <img 
+              loading="lazy"
               :src="(member.image && member.image !== '#') ? member.image : '/images/placeholder.png'" 
               :alt="member.name" 
               class="member-image" 
@@ -196,6 +295,7 @@ body {
   justify-content: center;
   align-items: center;
   padding: 2rem;
+  user-select: none;
 }
 
 .hero-section {
@@ -221,11 +321,13 @@ body {
   color: #ffffff;
   margin: 0;
   text-shadow: 0 0 4px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.3);
+  cursor: default;
 }
 
 .spinning-badge {
   width: 220px;
   height: 220px;
+  cursor: default;
 }
 
 .spinning-svg {
@@ -273,50 +375,111 @@ body {
   margin: 0 auto;
 }
 
-.carousel-wrapper {
+.carousel-header {
   display: flex;
-  gap: 1.5rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: 2rem; 
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
   
-  -ms-overflow-style: none;  
-  scrollbar-width: none;  
-  &::-webkit-scrollbar {
-    display: none;
+  .section-title {
+    margin-bottom: 0;
   }
 }
 
-.carousel-card {
-  flex: 0 0 300px; 
-  scroll-snap-align: start;
+.carousel-controls {
+  display: flex;
+  gap: 1rem;
 }
 
 .carousel-control {
-  position: absolute;
-  top: 45%;
-  transform: translateY(-50%);
   background: rgba(11, 2, 23, 0.8);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   font-size: 1.5rem;
   cursor: pointer;
-  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s ease;
+  user-select: none;
   
   &:hover {
     background: #00e5ff;
     color: #000;
   }
+}
+
+.marquee-viewport {
+  width: 100%;
+  overflow: hidden;
+  padding: 20px 0; 
+  margin: -20px 0;
+}
+
+.marquee-track {
+  display: flex;
+  gap: 2rem; 
+  width: max-content;
+  will-change: transform; /*! Forces GPU compositing */
+
+  &.is-static {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.vertical-card {
+  width: 300px;
+  height: 420px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; 
+  position: relative;
   
-  &.prev { left: -20px; }
-  &.next { right: -20px; }
-  
-  @media (max-width: 768px) {
-    display: none;
+  .card-content {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    h3 {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .status-badge {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem; 
+    right: auto;
+  }
+
+.card-action-btn {
+    position: absolute;
+    bottom: 2rem;
+    left: 2rem;
+    right: 2rem;
+    background: #00e5ff;
+    color: #000;
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  &:hover.active-tool {
+    .card-content {
+      transform: translateY(-60px);
+    }
+    .card-action-btn {
+      opacity: 1;
+      transform: translateY(0); 
+    }
   }
 }
 
@@ -411,11 +574,46 @@ body {
   transition: transform 0.3s ease, background 0.3s ease;
   overflow: hidden;
   
+  @media (max-width: 768px) {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(15, 5, 25, 0.85);
+  }
+
   &:hover.active-tool {
     transform: translateY(-5px);
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(0, 229, 255, 0.4);
   }
+}
+
+.horizontal-card {  
+  .fly-in-text {
+    position: absolute;
+    right: 2rem;
+    bottom: 2rem;
+    color: #00e5ff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  &:hover.active-tool {
+    .fly-in-text {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+.tool-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); 
 }
 
 .locked-tool {
@@ -512,6 +710,11 @@ body {
   
   transform: translateY(100%); 
   transition: transform 0.4s ease-in-out;
+
+  @media (max-width: 768px) {
+    backdrop-filter: none;
+    background: rgba(11, 2, 23, 0.95);
+  }
 }
 
 .overlay-description {
