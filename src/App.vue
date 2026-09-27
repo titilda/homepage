@@ -2,8 +2,24 @@
   import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
   import RippleBackground from './components/RippleBackground.vue'
   import SiteHeader from './components/SiteHeader.vue'
+  import failsafeMessages from './data/easter-egg.json'
   import toolsData from './data/tools.json'
   import members from './data/members.json'
+
+  let cardWidthWithGap = 332
+
+  const calculateLogScale = () => {
+    const baseWidth = 1920
+    const currentWidth = window.innerWidth
+    
+    const rawScale = Math.log(currentWidth) / Math.log(baseWidth)
+    
+    const clampedScale = Math.max(0.75, Math.min(rawScale, 1.1))
+    
+    document.documentElement.style.setProperty('--log-scale', clampedScale)
+
+    cardWidthWithGap = 20.75 * 16 * clampedScale
+  }
 
   const OnDocumentLoad = () => {
     window.scrollTo(0, 0)
@@ -20,8 +36,7 @@
   const targetSpeed = ref(baseSpeed)
   const currentSpeed = ref(baseSpeed)
   const scrollDirection = ref(-1) //? -1 = scroll left, 1 = scroll right
-  let trackPosition = 0 
-  const cardWidthWithGap = 332 
+  let trackPosition = 0  
   let animationId = null
 
   const hotToolsData = computed(() => toolsData.filter(tool => tool.hottest === true))
@@ -71,14 +86,40 @@
     animationId = requestAnimationFrame(updateMarquee)
   }
 
+  const maskedImages = ref({})
+
+  const generateMaskedImages = async () => {
+  for (const member of members) {
+    const rawUrl = (member.image && member.image !== '#') ? member.image : '/images/placeholder.png'
+    
+    try {
+      const response = await fetch(rawUrl) //* RAWRRRRR
+      const blob = await response.blob()
+      
+      maskedImages.value[member.name] = URL.createObjectURL(blob)
+    } catch (error) {
+      console.error('Failed to mask image:', error)
+    }
+  }
+}
+
+  const easterEggMessage = ref(failsafeMessages[0])
+
   onMounted(() => {
     OnDocumentLoad()
+    calculateLogScale()
+    generateMaskedImages()
     window.addEventListener('scroll', handleScroll)
+    window.addEventListener('resize', calculateLogScale)
     nextTick(() => { animationId = requestAnimationFrame(updateMarquee) })
+
+    const randomIndex = Math.floor(Math.random() * failsafeMessages.length)
+    easterEggMessage.value = failsafeMessages[randomIndex]  
   })
 
   onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll)
+    window.removeEventListener('resize', calculateLogScale)
     cancelAnimationFrame(animationId)
   })
 </script>
@@ -113,8 +154,10 @@
       <section class="glass-section tools-section">
         <div class="hottest-tools-container">
           <div class="carousel-header">
-            <!-- Add Flame SVG Here -->
-            <h2 class="section-title">Almost As Hot As You!</h2>
+            <h2 class="section-title flex-title">
+              <img src="/logos/flame.svg" alt="Flame icon" class="title-icon flame-icon" loading="lazy" />
+              Almost As Hot As You!
+            </h2>
             <div class="carousel-controls" v-if="shouldScroll">
               <!-- Mouse & Touch events bound to momentum functions -->
               <button 
@@ -166,7 +209,7 @@
                   target="_blank"
                   class="card-action-btn"
                 >
-                  View Tool
+                  Visit
                 </a>
               </div>
             </div>
@@ -219,20 +262,21 @@
       </section>
 
       <section class="glass-section roster-section">
-        <!-- Add Heisenber SVG icon here -->
-        <h2 class="section-title">Say Our Names</h2>
+        <h2 class="section-title layered-title">
+          <img src="/logos/heisenberg.svg" alt="Heisenberg icon" class="title-icon heisenberg-icon" loading="lazy" />
+          <span style="-webkit-text-stroke: 2px black; paint-order: stroke fill;">Say Our Names</span>
+        </h2>
         <div class="roster-grid">
           <div v-for="member in members" :key="member.name" class="member-card">
-
-            <img 
-              loading="lazy"
-              :src="(member.image && member.image !== '#') ? member.image : '/images/placeholder.png'" 
-              :alt="member.name" 
-              class="member-image" 
-            />
-            <span class="member-info">
-              <h3>{{ member.name }}</h3>
-            </span>
+            <div 
+                class="member-image-mask"
+                :style="{ backgroundImage: maskedImages[member.name] ? `url(${maskedImages[member.name]})` : 'none' }"
+                @contextmenu.prevent
+              ></div>
+              
+              <span class="member-info">
+                <h3>{{ member.name }}</h3>
+              </span>
             <div class="member-links-overlay">
               <div class="overlay-description">
                 <p>{{ member.description }}</p>
@@ -251,6 +295,11 @@
       </section>
 
     </div>
+    <div class="squish-failsafe">
+      <h2>{{ easterEggMessage.title }}</h2>
+      <p>{{ easterEggMessage.body }}</p>
+      <span class="ant-icon">{{ easterEggMessage.emoji }}</span>
+    </div>
   </div>
 </template>
 
@@ -262,6 +311,14 @@
   font-family: 'Inter', -apple-system, sans-serif;
 }
 
+:root {
+  --log-scale: 1; 
+}
+
+html {
+  font-size: calc(16px * var(--log-scale));
+}
+
 body {
   background-color: #000;
   color: #fff;
@@ -269,6 +326,16 @@ body {
   &:has(.tools-modal) {
     overflow: hidden;
   }
+}
+
+a, button, img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+img {
+  pointer-events: none;
 }
 
 .app-wrapper {
@@ -327,8 +394,8 @@ body {
 }
 
 .spinning-badge {
-  width: 220px;
-  height: 220px;
+  width: 13.75rem;
+  height: 13.75rem;
   cursor: default;
 }
 
@@ -338,7 +405,7 @@ body {
   animation: spin 25s linear infinite;
 
   text {
-    font-size: 22px;
+    font-size: 1.375rem;
     font-weight: 500;
     fill: #fff; 
     letter-spacing: 3.5px;
@@ -361,6 +428,19 @@ body {
   color: #fff;
 }
 
+.flex-title
+{
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.flame-icon {
+  width: 2.8rem;
+  height: auto;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7495%) hue-rotate(139deg) brightness(98%) contrast(100%);
+}
+
 .tools-section {
   min-height: 90vh;
   display: flex;
@@ -368,6 +448,7 @@ body {
   justify-content: flex-start;
   align-items: center; 
   padding-top: 11vh;
+  user-select: none;
 }
 
 .hottest-tools-container {
@@ -388,17 +469,12 @@ body {
   }
 }
 
-.carousel-controls {
-  display: flex;
-  gap: 1rem;
-}
-
 .carousel-control {
   background: rgba(11, 2, 23, 0.8);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  width: 50px;
-  height: 50px;
+  width: 3.125rem;
+  height: 3.125rem;
   border-radius: 50%;
   font-size: 1.5rem;
   cursor: pointer;
@@ -434,8 +510,8 @@ body {
 }
 
 .vertical-card {
-  width: 300px;
-  height: 420px;
+  width: 18.75rem;
+  height: 26.25rem;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -611,8 +687,8 @@ body {
 }
 
 .tool-logo {
-  width: 48px;
-  height: 48px;
+  width: 3rem;
+  height: 3rem;
   object-fit: contain;
   margin-bottom: 1rem;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); 
@@ -640,8 +716,28 @@ body {
   }
 }
 
+.layered-title {
+  position: relative;
+  display: inline-block;
+  z-index: 1; 
+}
+
+.heisenberg-icon {
+  position: absolute;
+  width: 7rem;
+  height: auto;
+  left: -5rem; 
+  top: -2rem; 
+  z-index: -1;
+  transform: rotate(15deg);
+  opacity: 0.8;
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7495%) hue-rotate(139deg) brightness(98%) contrast(100%);
+}
+
 .roster-section {
   position: relative;
+
+  user-select: none;
 }
 
 .roster-section::before {
@@ -658,10 +754,10 @@ body {
 
 .roster-grid {
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
   gap: 1.5rem;
   justify-content: center; 
+  width: 100%;
 }
 
 .member-card {
@@ -669,20 +765,31 @@ body {
   border-radius: 12px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.4);
-  aspect-ratio: 3/4; 
-
-  flex: 0 0 220px; 
-  max-width: 220px;
+  
+  width: 13.75rem;
+  height: calc(13.75rem * (4 / 3));
+  flex-shrink: 0;
   
   &:hover .member-links-overlay {
     transform: translateY(0); 
   }
 }
 
-.member-image {
+// .member-image {
+//   width: 100%;
+//   height: 100%;
+//   object-fit: cover;
+//   transition: opacity 0.3s;
+// }
+
+.member-image-mask {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   transition: opacity 0.3s;
 }
 
@@ -726,6 +833,7 @@ body {
   align-items: center;
   padding: 1.5rem;
   text-align: center;
+  user-select: text;
   
   p {
     font-size: 0.95rem;
@@ -762,10 +870,57 @@ body {
   }
 }
 
+.squish-failsafe {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  color: #fff;
+  
+  h2 {
+    color: #00e5ff;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    font-size: 1rem;
+    color: #aaa;
+    line-height: 1.5;
+    max-width: 250px;
+  }
+
+  .ant-icon {
+    font-size: 3rem;
+    margin-top: 2rem;
+    animation: jitter 0.5s infinite alternate;
+  }
+}
+
+@media (max-width: 300px) {
+  .content-layer {
+    display: none !important; 
+  }
+  
+  .squish-failsafe {
+    display: flex;
+  }
+}
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@keyframes jitter {
+  0% { transform: rotate(-10deg) translateX(-5px); }
+  100% { transform: rotate(10deg) translateX(5px); }
 }
 </style>
 
