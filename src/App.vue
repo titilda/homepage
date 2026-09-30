@@ -8,10 +8,18 @@
 
   let cardWidthWithGap = 332
 
+  const isMobile = ref(false)
+
+  const checkMobileState = () => {
+    isMobile.value = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768
+  }
+
   const calculateLogScale = () => {
     const baseWidth = 1920
     const currentWidth = window.innerWidth
     
+    checkMobileState()
+
     const rawScale = Math.log(currentWidth) / Math.log(baseWidth)
     
     const clampedScale = Math.max(0.75, Math.min(rawScale, 1.1))
@@ -19,6 +27,10 @@
     document.documentElement.style.setProperty('--log-scale', clampedScale)
 
     cardWidthWithGap = 20.75 * 16 * clampedScale
+
+    if (targetSpeed.value <= 1) {
+      targetSpeed.value = isMobile.value ? 0 : 1
+    }
   }
 
   const OnDocumentLoad = () => {
@@ -31,7 +43,7 @@
   const isModalOpen = ref(false)
 
   const trackRef = ref(null)
-  const baseSpeed = 1
+  const baseSpeed = computed(() => isMobile.value ? 0 : 1 )
   const maxSpeed = 12
   const targetSpeed = ref(baseSpeed)
   const currentSpeed = ref(baseSpeed)
@@ -40,7 +52,9 @@
   let animationId = null
 
   const hotToolsData = computed(() => toolsData.filter(tool => tool.hottest === true))
-  const shouldScroll = computed(() => hotToolsData.value.length > 3)
+  const shouldScroll = computed(() => {
+    return isMobile.value ? hotToolsData.value.length > 1 : hotToolsData.value.length > 3
+  })
 
   const hottestTools = computed(() => {
     const hotTools = hotToolsData.value
@@ -108,6 +122,7 @@
   onMounted(() => {
     OnDocumentLoad()
     calculateLogScale()
+    checkMobileState()
     generateMaskedImages()
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('resize', calculateLogScale)
@@ -317,11 +332,13 @@
 
 html {
   font-size: calc(16px * var(--log-scale));
+  overflow-x: hidden;
 }
 
 body {
   background-color: #000;
   color: #fff;
+  overflow-x: hidden;
 
   &:has(.tools-modal) {
     overflow: hidden;
@@ -341,6 +358,8 @@ img {
 .app-wrapper {
   position: relative;
   min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .content-layer {
@@ -419,6 +438,10 @@ img {
   padding: 6rem 3rem;
   max-width: 1200px;
   margin: 0 auto;
+
+  @media (max-width: 768px){
+    padding: 4rem 1.25rem;
+  }
 }
 
 .section-title {
@@ -426,6 +449,11 @@ img {
   font-weight: 800;
   margin-bottom: 3rem;
   color: #fff;
+
+  @media(max-width: 768px)
+  {
+    width: 1.8rem;
+  }
 }
 
 .flex-title
@@ -462,31 +490,51 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap; 
+  gap: 1rem;
   margin-bottom: 2rem;
   
   .section-title {
     margin-bottom: 0;
   }
-}
 
-.carousel-control {
-  background: rgba(11, 2, 23, 0.8);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  width: 3.125rem;
-  height: 3.125rem;
-  border-radius: 50%;
-  font-size: 1.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  user-select: none;
-  
-  &:hover {
-    background: #00e5ff;
-    color: #000;
+  .carousel-controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    align-items: center;
+    
+    @media (max-width: 768px) {
+      margin: 0 auto; 
+    }
+  }
+
+  .carousel-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(11, 2, 23, 0.8);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 3.125rem;
+    height: 3.125rem;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    flex-shrink: 0;
+
+    &:hover {
+      background: #00e5ff;
+      color: #000;
+    }
+
+    &:active {
+      background: #fff;
+      color: #000;
+    }
   }
 }
 
@@ -495,6 +543,20 @@ img {
   overflow: hidden;
   padding: 20px 0; 
   margin: -20px 0;
+
+  @media (max-width: 768px) {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 768px){
+  .see-all-wrapper{
+    justify-content: center;
+    margin-top: 2rem;
+  }
 }
 
 .marquee-track {
@@ -502,6 +564,7 @@ img {
   gap: 2rem; 
   width: max-content;
   will-change: transform; /*! Forces GPU compositing */
+  padding: 0 1.5rem;
 
   &.is-static {
     width: 100%;
@@ -564,7 +627,7 @@ img {
 .see-all-wrapper {
   display: flex;
   justify-content: flex-end;
-  margin-top: 1rem;
+  margin-top: 2rem;
 }
 
 .see-all-btn {
