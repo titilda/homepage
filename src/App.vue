@@ -5,6 +5,8 @@
   import failsafeMessages from './data/easter-egg.json'
   import toolsData from './data/tools.json'
   import members from './data/members.json'
+  import { Carousel } from '@fancyapps/ui'
+  import '@fancyapps/ui/dist/carousel/carousel.css'
 
   let cardWidthWithGap = 332
 
@@ -42,19 +44,19 @@
 
   const isModalOpen = ref(false)
 
-  const trackRef = ref(null)
-  const baseSpeed = computed(() => isMobile.value ? 0 : 1 )
-  const maxSpeed = 12
-  const targetSpeed = ref(baseSpeed)
-  const currentSpeed = ref(baseSpeed)
-  const scrollDirection = ref(-1) //? -1 = scroll left, 1 = scroll right
-  let trackPosition = 0  
-  let animationId = null
+  // // const trackRef = ref(null)
+  // // const baseSpeed = 1
+  // // const maxSpeed = 12
+  // // const targetSpeed = ref(baseSpeed)
+  // // const currentSpeed = ref(baseSpeed)
+  // // const scrollDirection = ref(-1) //? -1 = scroll left, 1 = scroll right
+  // // let trackPosition = 0  
+  // // let animationId = null
 
+  const carouselRef = ref(null)
+  let carouselInstance = null
   const hotToolsData = computed(() => toolsData.filter(tool => tool.hottest === true))
-  const shouldScroll = computed(() => {
-    return isMobile.value ? hotToolsData.value.length > 1 : hotToolsData.value.length > 3
-  })
+  const shouldScroll = computed(() => hotToolsData.value.length > 3) //? called like this due to previous logic, might implemement an auto scolling marquee if more than 3 hottest tools are present
 
   const hottestTools = computed(() => {
     const hotTools = hotToolsData.value
@@ -68,37 +70,37 @@
     return [...selected, ...selected, ...selected]
   })
 
-  const accelerate = (dir) => {
-    scrollDirection.value = dir
-    targetSpeed.value = maxSpeed
-  }
-  const decelerate = () => {
-    targetSpeed.value = baseSpeed
-  }
-  const pauseTrack = () => {
-    targetSpeed.value = 0
-  }
+  // // const accelerate = (dir) => {
+  // //   scrollDirection.value = dir
+  // //   targetSpeed.value = maxSpeed
+  // // }
+  // // const decelerate = () => {
+  // //   targetSpeed.value = baseSpeed
+  // // }
+  // // const pauseTrack = () => {
+  // //   targetSpeed.value = 0
+  // // }
 
-  const updateMarquee = () => {
-    if(!shouldScroll.value) return
+  // // const updateMarquee = () => {
+  // //   if(!shouldScroll.value) return
 
-    currentSpeed.value += (targetSpeed.value - currentSpeed.value) * 0.05
-    trackPosition += currentSpeed.value * scrollDirection.value
+  // //   currentSpeed.value += (targetSpeed.value - currentSpeed.value) * 0.05
+  // //   trackPosition += currentSpeed.value * scrollDirection.value
 
-    const singleSetWidth = (hottestTools.value.length / 3) * cardWidthWithGap
+  // //   const singleSetWidth = (hottestTools.value.length / 3) * cardWidthWithGap
     
-    if (trackPosition <= -singleSetWidth) {
-      trackPosition += singleSetWidth
-    } else if (trackPosition >= 0) {
-      trackPosition -= singleSetWidth
-    }
+  // //   if (trackPosition <= -singleSetWidth) {
+  // //     trackPosition += singleSetWidth
+  // //   } else if (trackPosition >= 0) {
+  // //     trackPosition -= singleSetWidth
+  // //   }
 
-    if (trackRef.value) {
-      trackRef.value.style.transform = `translateX(${trackPosition}px)`
-    }
+  // //   if (trackRef.value) {
+  // //     trackRef.value.style.transform = `translateX(${trackPosition}px)`
+  // //   }
 
-    animationId = requestAnimationFrame(updateMarquee)
-  }
+  // //   animationId = requestAnimationFrame(updateMarquee)
+  // // }
 
   const maskedImages = ref({})
 
@@ -126,7 +128,22 @@
     generateMaskedImages()
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('resize', calculateLogScale)
-    nextTick(() => { animationId = requestAnimationFrame(updateMarquee) })
+
+    nextTick(() => {
+      if (carouselRef.value && hottestTools.value.length > 0) {
+        carouselInstance = Carousel(carouselRef.value, {
+          Navigation: {
+            prevTpl: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M11 5l-7 7 7 7" stroke="currentColor" fill="none" stroke-width="2"/><path d="M4 12h16" stroke="currentColor" fill="none" stroke-width="2"/></svg>',
+            nextTpl: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 12h16" stroke="currentColor" fill="none" stroke-width="2"/><path d="M13 5l7 7-7 7" stroke="currentColor" fill="none" stroke-width="2"/></svg>',
+          },
+          infinite: true,
+          center: false,
+          slidesPerPage: 'auto',
+          transition: false,
+        })
+        carouselInstance.init()
+      }
+    })
 
     const randomIndex = Math.floor(Math.random() * failsafeMessages.length)
     easterEggMessage.value = failsafeMessages[randomIndex]  
@@ -135,7 +152,7 @@
   onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll)
     window.removeEventListener('resize', calculateLogScale)
-    cancelAnimationFrame(animationId)
+    if (carouselInstance) carouselInstance.destroy()
   })
 </script>
 
@@ -173,59 +190,41 @@
               <img src="/logos/flame.svg" alt="Flame icon" class="title-icon flame-icon" loading="lazy" />
               Almost As Hot As You!
             </h2>
-            <div class="carousel-controls" v-if="shouldScroll">
-              <!-- Mouse & Touch events bound to momentum functions -->
-              <button 
-                  class="carousel-control prev" 
-                  @mousedown="accelerate(1)" @mouseup="decelerate" @mouseleave="decelerate"
-                  @touchstart.prevent="accelerate(1)" @touchend.prevent="decelerate"
-                >&#8249;</button>
-                <button 
-                  class="carousel-control next" 
-                  @mousedown="accelerate(-1)" @mouseup="decelerate" @mouseleave="decelerate"
-                  @touchstart.prevent="accelerate(-1)" @touchend.prevent="decelerate"
-                >&#8250;</button>
-            </div>
           </div>
 
-          <div class="marquee-viewport">
-            <div 
-              class="marquee-track" 
-              :class="{ 'is-static': !shouldScroll }"
-              ref="trackRef"
-              @mouseenter="pauseTrack" 
-              @mouseleave="decelerate"
-            >
+          <div ref="carouselRef" class="f-carousel custom-carousel">
+            <div class="f-carousel__viewport">
               <div 
                 v-for="(tool, index) in hottestTools" 
                 :key="`${tool.id}-${index}`"
-                class="glass-card vertical-card" 
-                :class="tool.status === 'Live' ? 'active-tool' : 'locked-tool'"
+                class="f-carousel__slide"
               >
-                <div class="status-badge" :class="{ 'pending': tool.status !== 'Live' }">
-                  {{ tool.status }}
+                <div class="glass-card vertical-card" :class="tool.status === 'Live' ? 'active-tool' : 'locked-tool'">
+                  <div class="status-badge" :class="{ 'pending': tool.status !== 'Live' }">
+                    {{ tool.status }}
+                  </div>
+                  
+                  <div class="card-content">
+                    <img 
+                      v-if="tool.logo && tool.logo !== '#'" 
+                      loading="lazy"
+                      :src="tool.logo.startsWith('/') ? tool.logo : '/' + tool.logo" 
+                      :alt="`${tool.name} logo`" 
+                      class="tool-logo" 
+                    />
+                    <h3>{{ tool.name }}</h3>
+                    <p>{{ tool.description }}</p>
+                  </div>
+                  
+                  <a 
+                    v-if="tool.url && tool.status === 'Live'" 
+                    :href="tool.url" 
+                    target="_blank"
+                    class="card-action-btn"
+                  >
+                    Visit
+                  </a>
                 </div>
-                
-                <div class="card-content">
-                  <img 
-                    v-if="tool.logo && tool.logo !== '#'" 
-                    loading="lazy"
-                    :src="tool.logo.startsWith('/') ? tool.logo : '/' + tool.logo" 
-                    :alt="`${tool.name} logo`" 
-                    class="tool-logo" 
-                  />
-                  <h3>{{ tool.name }}</h3>
-                  <p>{{ tool.description }}</p>
-                </div>
-                
-                <a 
-                  v-if="tool.url && tool.status === 'Live'" 
-                  :href="tool.url" 
-                  target="_blank"
-                  class="card-action-btn"
-                >
-                  Visit
-                </a>
               </div>
             </div>
           </div>
@@ -497,80 +496,86 @@ img {
   .section-title {
     margin-bottom: 0;
   }
+}
+.custom-carousel {
+  max-width: 61.25rem;
+  margin: 0 auto;
+  
+  --f-carousel-spacing: 2.5rem; 
+  --f-carousel-slide-width: 18.75rem; 
+  
+  --f-button-bg: rgba(11, 2, 23, 0.8);
+  --f-button-color: #fff;
+  --f-button-hover-bg: #00e5ff;
+  --f-button-hover-color: #000;
+  
+  --f-button-width: 3.125rem;
+  --f-button-height: 3.125rem;
+  --f-button-border-radius: 50%;
+  
+  position: relative;
 
-  .carousel-controls {
+  .f-carousel__viewport {
+    padding: 1.5rem 0; 
+    margin: -1.5rem 0; 
+  }
+  
+  .f-carousel__nav {
+    position: absolute;
+    top: 50%;
+    left: -4rem;
+    right: -4rem;
+    transform: translateY(-50%);
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 1rem;
-    align-items: center;
-    
-    @media (max-width: 768px) {
-      margin: 0 auto; 
-    }
+    justify-content: space-between;
+    z-index: 10;
+    pointer-events: none; 
   }
 
-  .carousel-control {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(11, 2, 23, 0.8);
-    color: #fff;
+  .f-carousel__button {
+    pointer-events: auto; 
     border: 1px solid rgba(255, 255, 255, 0.2);
-    width: 3.125rem;
-    height: 3.125rem;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    cursor: pointer;
     transition: all 0.2s ease;
-    user-select: none;
-    flex-shrink: 0;
-
-    &:hover {
-      background: #00e5ff;
-      color: #000;
-    }
-
-    &:active {
-      background: #fff;
-      color: #000;
-    }
   }
 }
 
-.marquee-viewport {
-  width: 100%;
-  overflow: hidden;
-  padding: 20px 0; 
-  margin: -20px 0;
+.f-carousel__slide {
+  padding: 0;
+}
 
-  @media (max-width: 768px) {
+@media (max-width: 768px) {
+  .custom-carousel {
     width: 100vw;
-    position: relative;
+    max-width: 100vw;
     left: 50%;
     transform: translateX(-50%);
+    
+    .f-carousel__nav {
+      display: none;
+    }
   }
 }
 
-@media (max-width: 768px){
-  .see-all-wrapper{
-    justify-content: center;
-    margin-top: 2rem;
-  }
-}
-
-.marquee-track {
-  display: flex;
-  gap: 2rem; 
-  width: max-content;
-  will-change: transform; /*! Forces GPU compositing */
-  padding: 0 1.5rem;
-
-  &.is-static {
-    width: 100%;
-    justify-content: center;
-  }
-}
+// // .carousel-control {
+// //   background: rgba(11, 2, 23, 0.8);
+// //   color: #fff;
+// //   border: 1px solid rgba(255, 255, 255, 0.2);
+// //   width: 3.125rem;
+// //   height: 3.125rem;
+// //   border-radius: 50%;
+// //   font-size: 1.5rem;
+// //   cursor: pointer;
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: center;
+// //   transition: all 0.2s ease;
+// //   user-select: none;
+  
+// //   &:hover {
+// //     background: #00e5ff;
+// //     color: #000;
+// //   }
+// // }
 
 .vertical-card {
   width: 18.75rem;
@@ -986,4 +991,3 @@ img {
   100% { transform: rotate(10deg) translateX(5px); }
 }
 </style>
-
