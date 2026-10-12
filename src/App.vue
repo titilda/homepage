@@ -341,6 +341,7 @@
 
 :root {
   --log-scale: 1; 
+  overscroll-behavior: none;
 }
 
 html {
