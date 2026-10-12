@@ -8,6 +8,7 @@
   import { Carousel } from '@fancyapps/ui'
   import '@fancyapps/ui/dist/carousel/carousel.css'
 
+  const currentYear = new Date().getFullYear()
   let cardWidthWithGap = 332
 
   const isMobile = ref(false)
@@ -38,6 +39,21 @@
   const OnDocumentLoad = () => {
     window.scrollTo(0, 0)
   }
+
+  const fitBadgeText = () => {
+    const svg = document.querySelector('.spinning-svg');
+    const path = svg.querySelector('#circlePath');
+    const text = svg.querySelector('text');
+    const textPath = svg.querySelector('textPath');
+
+    text.style.letterSpacing = '0px';
+    const circumference = path.getTotalLength();
+    const natural = textPath.getComputedTextLength();
+    const chars = textPath.textContent.length;
+
+    text.style.letterSpacing = `${(circumference - natural) / chars}px`;
+}
+
 
   const scrollY = ref(0)
   const handleScroll = () => { scrollY.value = window.scrollY }
@@ -132,6 +148,7 @@
     OnDocumentLoad()
     calculateLogScale()
     checkMobileState()
+    fitBadgeText()
     generateMaskedImages()
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('resize', calculateLogScale)
@@ -178,9 +195,7 @@
               fill="none"
               />
               <text>
-                <textPath href="#circlePath" startOffset="0%">
-                  by students • for students • by students • for students 
-                </textPath>
+                <textPath href="#circlePath" startOffset="0">by students • for students •&nbsp;</textPath>
               </text>
             </svg>
           </div>
@@ -198,7 +213,7 @@
 
           <div class="carousel-outer-wrapper">
             
-            <button class="custom-nav-btn prev-btn" @click="slideCarousel('prev')" v-if="!isMobile">
+            <button class="custom-nav-btn prev-btn" @click="slideCarousel('prev')" v-if="!isMobile && shouldScroll">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M11 5l-7 7 7 7" stroke="currentColor" fill="none" stroke-width="2"/><path d="M4 12h16" stroke="currentColor" fill="none" stroke-width="2"/></svg>
             </button>
 
@@ -237,7 +252,7 @@
               </div>
             </div>
 
-            <button class="custom-nav-btn next-btn" @click="slideCarousel('next')" v-if="!isMobile">
+            <button class="custom-nav-btn next-btn" @click="slideCarousel('next')" v-if="!isMobile && shouldScroll">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 12h16" stroke="currentColor" fill="none" stroke-width="2"/><path d="M13 5l7 7-7 7" stroke="currentColor" fill="none" stroke-width="2"/></svg>
             </button>
 
@@ -328,6 +343,11 @@
       <p>{{ easterEggMessage.body }}</p>
       <span class="ant-icon">{{ easterEggMessage.emoji }}</span>
     </div>
+
+    <footer class="site-footer">
+        <p>Designed with &#x2764; by Nadav Moscovici</p>
+        <p>TiTilda &copy; 2022 - {{ currentYear }}</p>
+    </footer>
   </div>
 </template>
 
@@ -438,13 +458,18 @@ img {
   animation: spin 25s linear infinite;
 
   text {
-    font-size: 1.375rem;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: 700;
     fill: #fff; 
     letter-spacing: 3.5px;
     text-transform: uppercase;
 
-    text-shadow: 0 0 4px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.3);
+    stroke: rgba(10, 0, 30, 0.85);
+    stroke-width: 3px;
+    paint-order: stroke fill;
+    stroke-linejoin: round;
+
+     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
   }
 }
 
@@ -1009,6 +1034,45 @@ img {
   
   .squish-failsafe {
     display: flex;
+  }
+}
+
+.site-footer {
+  position: relative;
+  width: 100%;
+  user-select: none;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 4rem 2rem 2rem;
+  text-align: center;
+  z-index: 10;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 100%;
+    background: #000000;
+    z-index: -1;
+  }
+  
+  p {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
   }
 }
 

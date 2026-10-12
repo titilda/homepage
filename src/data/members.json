@@ -12,7 +12,7 @@
   }, 
   {
     "name": "Alessandro Modica",
-    "description": "Goth Baddies Rule",
+    "description": "",
     "image": "/images/alessandro.png",
     "links": {
       "cv": "#",
@@ -23,7 +23,7 @@
   },
   {
     "name": "Andrea Oggioni",
-    "description": "Non fatemi foto",
+    "description": "",
     "image": "/images/andrea0.png",
     "links": {
       "cv": "#",
@@ -34,7 +34,7 @@
   },
   {
     "name": "Andrea Lunghi",
-    "description": "Omen Nomen",
+    "description": "",
     "image": "/images/andrea2.png",
     "links": {
       "cv": "#",
@@ -45,7 +45,7 @@
   },
   {
     "name": "Joele Andrea Ortore",
-    "description": "Palla Nuoto",
+    "description": "",
     "image": "/images/joele.png",
     "links": {
       "cv": "#",
@@ -56,7 +56,7 @@
   },
   {
     "name": "Niccolo Papini",
-    "description": "The Monster",
+    "description": "",
     "image": "/images/niccolo.png",
     "links": {
       "cv": "#",
@@ -67,7 +67,84 @@
   }, 
   {
     "name": "Mattia Martinelli",
-    "description": "I will fuck your mom\n\nRAWRR",
+    "description": "",
+    "image": "#",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  },
+  {
+    "name": "Alessio Perini",
+    "description": "",
+    "image": "#",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  },
+  {
+    "name": "Alexandru Nechita",
+    "description": "",
+    "image": "#",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  },
+  {
+    "name": "Emanuel Mihali",
+    "description": "",
+    "image": "#",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  },
+  {
+    "name": "Federica Sofia Paris",
+    "description": "",
+    "image": "#",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  },
+  {
+    "name": "Antonio La Montagna",
+    "description": "",
+    "image": "#",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  },
+  {
+    "name": "Simone Orbon",
+    "description": "",
+    "image": "#",
+    "links": {
+      "cv": "#",
+      "website": "#",
+      "github": "#",
+      "linkedin": "#"
+    }
+  },
+  {
+    "name": "Michele Non Mi Ricordo Il Cognome",
+    "description": "",
     "image": "#",
     "links": {
       "cv": "#",
