@@ -30,9 +30,9 @@
 
     cardWidthWithGap = 20.75 * 16 * clampedScale
 
-    if (targetSpeed.value <= 1) {
-      targetSpeed.value = isMobile.value ? 0 : 1
-    }
+    // // if (targetSpeed.value <= 1) {
+    // //   targetSpeed.value = isMobile.value ? 0 : 1
+    // // }
   }
 
   const OnDocumentLoad = () => {
@@ -119,6 +119,13 @@
   }
 }
 
+  const slideCarousel = (direction) => {
+    if (!carouselRef.value) return
+    
+    if (direction === 'prev') carouselInstance.prev()
+    if (direction === 'next') carouselInstance.next()
+  }
+
   const easterEggMessage = ref(failsafeMessages[0])
 
   onMounted(() => {
@@ -132,14 +139,11 @@
     nextTick(() => {
       if (carouselRef.value && hottestTools.value.length > 0) {
         carouselInstance = Carousel(carouselRef.value, {
-          Navigation: {
-            prevTpl: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M11 5l-7 7 7 7" stroke="currentColor" fill="none" stroke-width="2"/><path d="M4 12h16" stroke="currentColor" fill="none" stroke-width="2"/></svg>',
-            nextTpl: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 12h16" stroke="currentColor" fill="none" stroke-width="2"/><path d="M13 5l7 7-7 7" stroke="currentColor" fill="none" stroke-width="2"/></svg>',
-          },
+          Navigation: true,
           infinite: true,
-          center: false,
+          center: true,
           slidesPerPage: 'auto',
-          transition: false,
+          transition: 'slide',
         })
         carouselInstance.init()
       }
@@ -192,8 +196,13 @@
             </h2>
           </div>
 
-          <div ref="carouselRef" class="f-carousel custom-carousel">
-            <div class="f-carousel__viewport">
+          <div class="carousel-outer-wrapper">
+            
+            <button class="custom-nav-btn prev-btn" @click="slideCarousel('prev')" v-if="!isMobile">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M11 5l-7 7 7 7" stroke="currentColor" fill="none" stroke-width="2"/><path d="M4 12h16" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+            </button>
+
+            <div ref="carouselRef" class="f-carousel custom-carousel">
               <div 
                 v-for="(tool, index) in hottestTools" 
                 :key="`${tool.id}-${index}`"
@@ -227,6 +236,11 @@
                 </div>
               </div>
             </div>
+
+            <button class="custom-nav-btn next-btn" @click="slideCarousel('next')" v-if="!isMobile">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 12h16" stroke="currentColor" fill="none" stroke-width="2"/><path d="M13 5l7 7-7 7" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+            </button>
+
           </div>
 
           <div class="see-all-wrapper">
@@ -449,9 +463,10 @@ img {
   margin-bottom: 3rem;
   color: #fff;
 
-  @media(max-width: 768px)
-  {
-    width: 1.8rem;
+  @media (max-width: 768px) {
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 2rem;
   }
 }
 
@@ -480,62 +495,71 @@ img {
 
 .hottest-tools-container {
   position: relative;
-  width: 100%;
+  width: 75vw;
   max-width: 1000px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .carousel-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  flex-wrap: wrap; 
-  gap: 1rem;
   margin-bottom: 2rem;
   
   .section-title {
     margin-bottom: 0;
   }
 }
-.custom-carousel {
-  max-width: 61.25rem;
-  margin: 0 auto;
-  
-  --f-carousel-spacing: 2.5rem; 
-  --f-carousel-slide-width: 18.75rem; 
-  
-  --f-button-bg: rgba(11, 2, 23, 0.8);
-  --f-button-color: #fff;
-  --f-button-hover-bg: #00e5ff;
-  --f-button-hover-color: #000;
-  
-  --f-button-width: 3.125rem;
-  --f-button-height: 3.125rem;
-  --f-button-border-radius: 50%;
-  
+
+.carousel-outer-wrapper {
   position: relative;
+  max-width: 69.25rem;
+  margin: 0 auto;
+  padding: 0 4rem; 
+}
+
+.custom-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3.125rem;
+  height: 3.125rem;
+  border-radius: 50%;
+  background: rgba(11, 2, 23, 0.8);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  z-index: 999; 
+
+  &:hover {
+    background: #00e5ff;
+    color: #000;
+  }
+
+  &.prev-btn { left: 0; }
+  &.next-btn { right: 0; }
+}
+
+.custom-carousel {
+  width: 100%;
+  
+  --f-carousel-gap: 1rem;
+  --f-carousel-slide-width: calc((100% - 1rem) / 3);
 
   .f-carousel__viewport {
     padding: 1.5rem 0; 
     margin: -1.5rem 0; 
-  }
-  
-  .f-carousel__nav {
-    position: absolute;
-    top: 50%;
-    left: -4rem;
-    right: -4rem;
-    transform: translateY(-50%);
-    display: flex;
-    justify-content: space-between;
-    z-index: 10;
-    pointer-events: none; 
+    overflow: visible;     
   }
 
-  .f-carousel__button {
-    pointer-events: auto; 
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.2s ease;
+  .f-carousel__nav {
+    display: none !important;
   }
 }
 
@@ -543,16 +567,29 @@ img {
   padding: 0;
 }
 
+.vertical-card {
+  width: 100%;
+  height: 26.25rem;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; 
+  position: relative;
+}
+
 @media (max-width: 768px) {
-  .custom-carousel {
+  .carousel-outer-wrapper {
     width: 100vw;
     max-width: 100vw;
     left: 50%;
     transform: translateX(-50%);
     
-    .f-carousel__nav {
-      display: none;
-    }
+    padding: 0; 
+  }
+
+  .custom-carousel {
+    --f-carousel-slide-width: 16.5rem; 
+    --f-carousel-gap: 1rem;
   }
 }
 
@@ -578,13 +615,6 @@ img {
 // // }
 
 .vertical-card {
-  width: 18.75rem;
-  height: 26.25rem;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end; 
-  position: relative;
   
   .card-content {
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
