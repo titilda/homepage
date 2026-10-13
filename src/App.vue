@@ -322,7 +322,7 @@
               </span>
             <div class="member-links-overlay">
               <div class="overlay-description">
-                <p>{{ member.description }}</p>
+                <p v-html="member.description"></p>
               </div>
               
               <div class="overlay-buttons">
@@ -964,6 +964,17 @@ img {
     line-height: 1.5;
     color: #ffffff;
     white-space: pre-line;
+    
+    //? Wanted to limit to 150 chars
+    //? Line breaks were an issue though
+    //? 7 lines is exactly 150 chars
+    //? Spaces included
+    display: -webkit-box;
+    line-clamp: 7;
+    -webkit-line-clamp: 7; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: clip;
   }
 }
 
