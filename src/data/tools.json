@@ -1,0 +1,11 @@
+[
+  {
+    "id": "appunti",
+    "name": "Appunti",
+    "logo": "/logos/ta_logo.svg",
+    "description": "Descrizion appunti",
+    "status": "Live",
+    "url": "https://appunti.titilda.org",
+    "hottest": true
+  }
+]
