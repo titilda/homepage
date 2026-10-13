@@ -7,29 +7,31 @@
       "cv": "https://www.nadavmoscovici.com/files/nadav_moscovici_cv.pdf",
       "website": "https://www.nadavmoscovici.com",
       "github": "https://github.com/CrawlingWharf90",
-      "linkedin": "https://www.linkedin.com/in/nadav-moscovici-465185214/"
+      "linkedin": "https://www.linkedin.com/in/nadav-moscovici-465185214/",
+      "instagram": "https://www.instagram.com/unclenadu/"
     }
   }, 
   {
     "name": "Alessandro Modica",
-    "description": "",
+    "description": "Dual Grad student @ UIC, PoliMi",
     "image": "/images/alessandro.png",
     "links": {
       "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
+      "website": "https://modica.io",
+      "github": "https://github.com/TheManchineel",
+      "linkedin": "https://www.linkedin.com/in/alessandro-modica/",
+      "instagram": "https://www.instagram.com/modica.io/"
     }
   },
   {
     "name": "Andrea Oggioni",
-    "description": "",
+    "description": "HPCe student @ PoliMi\n\n<i>Computer architecture enthusiast</i>",
     "image": "/images/andrea0.png",
     "links": {
       "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
+      "website": "https://etabeta1.github.io",
+      "github": "https://github.com/etabeta1",
+      "linkedin": "https://www.linkedin.com/in/oggioniandrea"
     }
   },
   {
