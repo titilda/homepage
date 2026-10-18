@@ -4,23 +4,59 @@
     "description": "HCIDXR Student\n28Digital Master School\n\n<i>'Art is a lie that makes us realize truth.'</i>\n\t<b><i>Pablo Picasso</i></b>",
     "image": "/images/nadav.png",
     "links": {
-      "cv": "https://www.nadavmoscovici.com/files/nadav_moscovici_cv.pdf",
-      "website": "https://www.nadavmoscovici.com",
-      "github": "https://github.com/CrawlingWharf90",
-      "linkedin": "https://www.linkedin.com/in/nadav-moscovici-465185214/",
-      "instagram": "https://www.instagram.com/unclenadu/"
+      "cv": [
+        {
+          "name": "CV",
+          "url": "https://www.nadavmoscovici.com/files/nadav_moscovici_cv.pdf"
+        }
+      ],
+      "website": [
+        {
+          "name": "Website",
+          "url": "https://www.nadavmoscovici.com"
+        }
+      ],
+      "socials": [
+        {
+          "name": "Instagram",
+          "url": "https://www.instagram.com/unclenadu/"
+        },
+        {
+          "name": "GitHub",
+          "url": "https://github.com/CrawlingWharf90"
+        },
+        {
+          "name": "LinkedIn",
+          "url": "https://www.linkedin.com/in/nadav-moscovici-465185214/"
+        }
+      ]
     }
-  }, 
+  },
   {
     "name": "Alessandro Modica",
     "description": "Dual Grad student @ UIC, PoliMi",
     "image": "/images/alessandro.png",
     "links": {
-      "cv": "#",
-      "website": "https://modica.io",
-      "github": "https://github.com/TheManchineel",
-      "linkedin": "https://www.linkedin.com/in/alessandro-modica/",
-      "instagram": "https://www.instagram.com/modica.io/"
+      "website": [
+        {
+          "name": "Website",
+          "url": "https://modica.io"
+        }
+      ],
+      "socials": [
+        {
+          "name": "Instagram",
+          "url": "https://www.instagram.com/modica.io/"
+        },
+        {
+          "name": "GitHub",
+          "url": "https://github.com/TheManchineel"
+        },
+        {
+          "name": "LinkedIn",
+          "url": "https://www.linkedin.com/in/alessandro-modica/"
+        }
+      ]
     }
   },
   {
@@ -28,142 +64,94 @@
     "description": "HPCe student @ PoliMi\n\n<i>Computer architecture enthusiast</i>",
     "image": "/images/andrea0.png",
     "links": {
-      "cv": "#",
-      "website": "https://etabeta1.github.io",
-      "github": "https://github.com/etabeta1",
-      "linkedin": "https://www.linkedin.com/in/oggioniandrea"
+      "website": [
+        {
+          "name": "Website",
+          "url": "https://etabeta1.github.io"
+        }
+      ],
+      "socials": [
+        {
+          "name": "GitHub",
+          "url": "https://github.com/etabeta1"
+        },
+        {
+          "name": "LinkedIn",
+          "url": "https://www.linkedin.com/in/oggioniandrea"
+        }
+      ]
     }
   },
   {
     "name": "Andrea Lunghi",
     "description": "",
     "image": "/images/andrea2.png",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
+    "links": {}
   },
   {
     "name": "Joele Andrea Ortore",
     "description": "",
     "image": "/images/joele.png",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
+    "links": {}
   },
   {
     "name": "Niccolo Papini",
     "description": "",
     "image": "/images/niccolo.png",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
-  }, 
+    "links": {}
+  },
   {
     "name": "Mattia Martinelli",
     "description": "",
     "image": "#",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
+    "links": {}
   },
   {
     "name": "Alessio Perini",
     "description": "",
     "image": "#",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
+    "links": {}
   },
   {
     "name": "Alexandru Nechita",
     "description": "",
     "image": "#",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
+    "links": {}
   },
   {
     "name": "Emanuel Mihali",
     "description": "",
     "image": "#",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
+    "links": {}
   },
   {
     "name": "Federica Sofia Paris",
     "description": "",
     "image": "#",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
+    "links": {}
   },
   {
     "name": "Antonio La Montagna",
     "description": "",
     "image": "#",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
+    "links": {}
   },
   {
     "name": "Simone Orbon",
     "description": "",
     "image": "#",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
+    "links": {}
   },
   {
     "name": "Michele Mantione",
     "description": "",
     "image": "#",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
+    "links": {}
   },
   {
     "name": "Matteo Lunghi",
     "description": "",
     "image": "#",
-    "links": {
-      "cv": "#",
-      "website": "#",
-      "github": "#",
-      "linkedin": "#"
-    }
+    "links": {}
   }
 ]

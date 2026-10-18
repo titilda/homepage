@@ -118,6 +118,48 @@
   // //   animationId = requestAnimationFrame(updateMarquee)
   // // }
 
+  const linkTypes = [
+    { key: 'cv', label: 'CV' },
+    { key: 'website', label: 'Web' },
+    { key: 'socials', label: 'Socials', nameWhenSingle: true },
+  ]
+
+  const roster = members.map(member => ({
+    ...member,
+    groups: linkTypes
+      .map(type => {
+        const items = (member.links?.[type.key] ?? []).filter(link => link.url && link.url !== '#')
+        const label = type.nameWhenSingle && items.length === 1 ? items[0].name : type.label
+        return { ...type, label, items }
+      })
+      .filter(group => group.items.length > 0),
+  }))
+
+  //! Only one dropdown can be open at a time: { member: 'Name', key: 'github' } or null
+  const openMenu = ref(null)
+
+  const isMenuOpen = (member, key) =>
+    openMenu.value?.member === member.name && openMenu.value?.key === key
+
+  const toggleMenu = (member, key) => {
+    openMenu.value = isMenuOpen(member, key) ? null : { member: member.name, key }
+  }
+
+  const closeMenu = () => { openMenu.value = null }
+
+  const menuItems = (member) => {
+    if (openMenu.value?.member !== member.name) return []
+    return member.groups.find(group => group.key === openMenu.value.key)?.items ?? []
+  }
+
+  const handleDocumentClick = (event) => {
+    if (!event.target.closest('.overlay-buttons')) closeMenu()
+  }
+
+  const handleKeydown = (event) => {
+    if (event.key === 'Escape') closeMenu()
+  }
+
   const maskedImages = ref({})
 
   const generateMaskedImages = async () => {
@@ -152,6 +194,8 @@
     generateMaskedImages()
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('resize', calculateLogScale)
+    document.addEventListener('click', handleDocumentClick)
+    document.addEventListener('keydown', handleKeydown)
 
     nextTick(() => {
       if (carouselRef.value && hottestTools.value.length > 0) {
@@ -173,6 +217,8 @@
   onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll)
     window.removeEventListener('resize', calculateLogScale)
+    document.removeEventListener('click', handleDocumentClick)
+    document.removeEventListener('keydown', handleKeydown)
     if (carouselInstance) carouselInstance.destroy()
   })
 </script>
@@ -310,7 +356,7 @@
           <span style="-webkit-text-stroke: 2px black; paint-order: stroke fill;">Say Our Names</span>
         </h2>
         <div class="roster-grid">
-          <div v-for="member in members" :key="member.name" class="member-card">
+          <div v-for="member in roster" :key="member.name" class="member-card" @mouseleave="closeMenu">
             <div 
                 class="member-image-mask"
                 :style="{ backgroundImage: maskedImages[member.name] ? `url(${maskedImages[member.name]})` : 'none' }"
@@ -326,11 +372,33 @@
               </div>
               
               <div class="overlay-buttons">
-                <a v-if="member.links.cv && member.links.cv !== '#'" :href="member.links.cv" target="_blank" class="link-btn">CV</a>
-                <a v-if="member.links.website && member.links.website !== '#'" :href="member.links.website" target="_blank" class="link-btn">Web</a>
-                <a v-if="member.links.github && member.links.github !== '#'" :href="member.links.github" target="_blank" class="link-btn">GitHub</a>
-                <a v-if="member.links.linkedin && member.links.linkedin !== '#'" :href="member.links.linkedin" target="_blank" class="link-btn">LinkedIn</a>
-                <a v-if="member.links.instagram && member.links.instagram !== '#'" :href="member.links.instagram" target="_blank" class="link-btn">IG</a>
+                <template v-for="group in member.groups" :key="group.key">
+                  <a
+                    v-if="group.items.length === 1"
+                    :href="group.items[0].url"
+                    target="_blank"
+                    rel="noopener"
+                    class="link-btn"
+                  >{{ group.label }}</a>
+
+                  <button
+                    v-else
+                    type="button"
+                    class="link-btn has-menu"
+                    :class="{ active: isMenuOpen(member, group.key) }"
+                    aria-haspopup="true"
+                    :aria-expanded="isMenuOpen(member, group.key)"
+                    @click="toggleMenu(member, group.key)"
+                  >{{ group.label }} <span class="chevron">&#9662;</span></button>
+                </template>
+
+                <Transition name="menu-fade">
+                  <ul v-if="menuItems(member).length" class="link-menu" role="menu">
+                    <li v-for="item in menuItems(member)" :key="item.url" role="none">
+                      <a :href="item.url" target="_blank" rel="noopener" role="menuitem" @click="closeMenu">{{ item.name }}</a>
+                    </li>
+                  </ul>
+                </Transition>
               </div>
             </div>
           </div>
@@ -979,6 +1047,7 @@ img {
 }
 
 .overlay-buttons {
+  position: relative;
   height: 30%;
   display: flex;
   flex-wrap: wrap;
@@ -1003,6 +1072,69 @@ img {
     color: #000;
     border-color: #00e5ff;
   }
+}
+
+.link-btn {
+  cursor: pointer;
+
+  &.has-menu {
+    font-family: inherit;
+
+    .chevron {
+      display: inline-block;
+      font-size: 0.7em;
+      transition: transform 0.2s ease;
+    }
+
+    &.active {
+      background: #00e5ff;
+      color: #000;
+      border-color: #00e5ff;
+
+      .chevron { transform: rotate(180deg); }
+    }
+  }
+}
+
+.link-menu {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: calc(100% + 0.25rem);
+  z-index: 5;
+  list-style: none;
+  max-height: 7.5rem;
+  overflow-y: auto;
+  padding: 0.25rem;
+  background: rgba(11, 2, 23, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+
+  a {
+    display: block;
+    padding: 0.4rem 0.6rem;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      background: #00e5ff;
+      color: #000;
+    }
+  }
+}
+
+.menu-fade-enter-active,
+.menu-fade-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.menu-fade-enter-from,
+.menu-fade-leave-to {
+  opacity: 0;
+  transform: translateY(4px);
 }
 
 .squish-failsafe {
