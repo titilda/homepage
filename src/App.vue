@@ -1,247 +1,269 @@
 <script setup>
-  import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-  import RippleBackground from './components/RippleBackground.vue'
-  import SiteHeader from './components/SiteHeader.vue'
-  import failsafeMessages from './data/easter-egg.json'
-  import toolsData from './data/tools.json'
-  import members from './data/members.json'
-  import { Carousel } from '@fancyapps/ui'
-  import '@fancyapps/ui/dist/carousel/carousel.css'
+import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
+import RippleBackground from "./components/RippleBackground.vue";
+import SiteHeader from "./components/SiteHeader.vue";
+import failsafeMessages from "./data/easter-egg.json";
+import toolsData from "./data/tools.json";
+import members from "./data/members.json";
+import { Carousel } from "@fancyapps/ui";
+import "@fancyapps/ui/dist/carousel/carousel.css";
 
-  const currentYear = new Date().getFullYear()
-  let cardWidthWithGap = 332
+const currentYear = new Date().getFullYear();
+let cardWidthWithGap = 332;
 
-  const isMobile = ref(false)
+const isMobile = ref(false);
 
-  const checkMobileState = () => {
-    isMobile.value = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768
-  }
+const checkMobileState = () => {
+  isMobile.value =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent,
+    ) || window.innerWidth <= 768;
+};
 
-  const calculateLogScale = () => {
-    const baseWidth = 1920
-    const currentWidth = window.innerWidth
-    
-    checkMobileState()
+const calculateLogScale = () => {
+  const baseWidth = 1920;
+  const currentWidth = window.innerWidth;
 
-    const rawScale = Math.log(currentWidth) / Math.log(baseWidth)
-    
-    const clampedScale = Math.max(0.75, Math.min(rawScale, 1.1))
-    
-    document.documentElement.style.setProperty('--log-scale', clampedScale)
+  checkMobileState();
 
-    cardWidthWithGap = 20.75 * 16 * clampedScale
+  const rawScale = Math.log(currentWidth) / Math.log(baseWidth);
 
-    // // if (targetSpeed.value <= 1) {
-    // //   targetSpeed.value = isMobile.value ? 0 : 1
-    // // }
-  }
+  const clampedScale = Math.max(0.75, Math.min(rawScale, 1.1));
 
-  const OnDocumentLoad = () => {
-    window.scrollTo(0, 0)
-  }
+  document.documentElement.style.setProperty("--log-scale", clampedScale);
 
-  const fitBadgeText = () => {
-    const svg = document.querySelector('.spinning-svg');
-    const path = svg.querySelector('#circlePath');
-    const text = svg.querySelector('text');
-    const textPath = svg.querySelector('textPath');
+  cardWidthWithGap = 20.75 * 16 * clampedScale;
 
-    text.style.letterSpacing = '0px';
-    const circumference = path.getTotalLength();
-    const natural = textPath.getComputedTextLength();
-    const chars = textPath.textContent.length;
-
-    text.style.letterSpacing = `${(circumference - natural) / chars}px`;
-}
-
-
-  const scrollY = ref(0)
-  const handleScroll = () => { scrollY.value = window.scrollY }
-
-  const isModalOpen = ref(false)
-
-  // // const trackRef = ref(null)
-  // // const baseSpeed = 1
-  // // const maxSpeed = 12
-  // // const targetSpeed = ref(baseSpeed)
-  // // const currentSpeed = ref(baseSpeed)
-  // // const scrollDirection = ref(-1) //? -1 = scroll left, 1 = scroll right
-  // // let trackPosition = 0  
-  // // let animationId = null
-
-  const carouselRef = ref(null)
-  let carouselInstance = null
-  const hotToolsData = computed(() => toolsData.filter(tool => tool.hottest === true))
-  const shouldScroll = computed(() => hotToolsData.value.length > 3) //? called like this due to previous logic, might implemement an auto scolling marquee if more than 3 hottest tools are present
-
-  const hottestTools = computed(() => {
-    const hotTools = hotToolsData.value
-    
-    if(!shouldScroll.value) return hotTools
-
-    const selected = hotTools.length > 5 
-      ? hotTools.sort(() => 0.5 - Math.random()).slice(0, 5) 
-      : hotTools
-    
-    return [...selected, ...selected, ...selected]
-  })
-
-  // // const accelerate = (dir) => {
-  // //   scrollDirection.value = dir
-  // //   targetSpeed.value = maxSpeed
+  // // if (targetSpeed.value <= 1) {
+  // //   targetSpeed.value = isMobile.value ? 0 : 1
   // // }
-  // // const decelerate = () => {
-  // //   targetSpeed.value = baseSpeed
-  // // }
-  // // const pauseTrack = () => {
-  // //   targetSpeed.value = 0
-  // // }
+};
 
-  // // const updateMarquee = () => {
-  // //   if(!shouldScroll.value) return
+const OnDocumentLoad = () => {
+  window.scrollTo(0, 0);
+};
 
-  // //   currentSpeed.value += (targetSpeed.value - currentSpeed.value) * 0.05
-  // //   trackPosition += currentSpeed.value * scrollDirection.value
+const fitBadgeText = () => {
+  const svg = document.querySelector(".spinning-svg");
+  const path = svg.querySelector("#circlePath");
+  const text = svg.querySelector("text");
+  const textPath = svg.querySelector("textPath");
 
-  // //   const singleSetWidth = (hottestTools.value.length / 3) * cardWidthWithGap
-    
-  // //   if (trackPosition <= -singleSetWidth) {
-  // //     trackPosition += singleSetWidth
-  // //   } else if (trackPosition >= 0) {
-  // //     trackPosition -= singleSetWidth
-  // //   }
+  text.style.letterSpacing = "0px";
+  const circumference = path.getTotalLength();
+  const natural = textPath.getComputedTextLength();
+  const chars = textPath.textContent.length;
 
-  // //   if (trackRef.value) {
-  // //     trackRef.value.style.transform = `translateX(${trackPosition}px)`
-  // //   }
+  text.style.letterSpacing = `${(circumference - natural) / chars}px`;
+};
 
-  // //   animationId = requestAnimationFrame(updateMarquee)
-  // // }
+const scrollY = ref(0);
+const handleScroll = () => {
+  scrollY.value = window.scrollY;
+};
 
-  const linkTypes = [
-    { key: 'cv', label: 'CV' },
-    { key: 'website', label: 'Web' },
-    { key: 'socials', label: 'Socials', nameWhenSingle: true },
-  ]
+const isModalOpen = ref(false);
 
-  const roster = members.map(member => ({
-    ...member,
-    groups: linkTypes
-      .map(type => {
-        const items = (member.links?.[type.key] ?? []).filter(link => link.url && link.url !== '#')
-        const label = type.nameWhenSingle && items.length === 1 ? items[0].name : type.label
-        return { ...type, label, items }
-      })
-      .filter(group => group.items.length > 0),
-  }))
+// // const trackRef = ref(null)
+// // const baseSpeed = 1
+// // const maxSpeed = 12
+// // const targetSpeed = ref(baseSpeed)
+// // const currentSpeed = ref(baseSpeed)
+// // const scrollDirection = ref(-1) //? -1 = scroll left, 1 = scroll right
+// // let trackPosition = 0
+// // let animationId = null
 
-  //! Only one dropdown can be open at a time: { member: 'Name', key: 'github' } or null
-  const openMenu = ref(null)
+const carouselRef = ref(null);
+let carouselInstance = null;
+const hotToolsData = computed(() =>
+  toolsData.filter((tool) => tool.hottest === true),
+);
+const shouldScroll = computed(() => hotToolsData.value.length > 3); //? called like this due to previous logic, might implemement an auto scolling marquee if more than 3 hottest tools are present
 
-  const isMenuOpen = (member, key) =>
-    openMenu.value?.member === member.name && openMenu.value?.key === key
+const hottestTools = computed(() => {
+  const hotTools = hotToolsData.value;
 
-  const toggleMenu = (member, key) => {
-    openMenu.value = isMenuOpen(member, key) ? null : { member: member.name, key }
-  }
+  if (!shouldScroll.value) return hotTools;
 
-  const closeMenu = () => { openMenu.value = null }
+  const selected =
+    hotTools.length > 5
+      ? hotTools.sort(() => 0.5 - Math.random()).slice(0, 5)
+      : hotTools;
 
-  const menuItems = (member) => {
-    if (openMenu.value?.member !== member.name) return []
-    return member.groups.find(group => group.key === openMenu.value.key)?.items ?? []
-  }
+  return [...selected, ...selected, ...selected];
+});
 
-  const handleDocumentClick = (event) => {
-    if (!event.target.closest('.overlay-buttons')) closeMenu()
-  }
+// // const accelerate = (dir) => {
+// //   scrollDirection.value = dir
+// //   targetSpeed.value = maxSpeed
+// // }
+// // const decelerate = () => {
+// //   targetSpeed.value = baseSpeed
+// // }
+// // const pauseTrack = () => {
+// //   targetSpeed.value = 0
+// // }
 
-  const handleKeydown = (event) => {
-    if (event.key === 'Escape') closeMenu()
-  }
+// // const updateMarquee = () => {
+// //   if(!shouldScroll.value) return
 
-  const maskedImages = ref({})
+// //   currentSpeed.value += (targetSpeed.value - currentSpeed.value) * 0.05
+// //   trackPosition += currentSpeed.value * scrollDirection.value
 
-  const generateMaskedImages = async () => {
+// //   const singleSetWidth = (hottestTools.value.length / 3) * cardWidthWithGap
+
+// //   if (trackPosition <= -singleSetWidth) {
+// //     trackPosition += singleSetWidth
+// //   } else if (trackPosition >= 0) {
+// //     trackPosition -= singleSetWidth
+// //   }
+
+// //   if (trackRef.value) {
+// //     trackRef.value.style.transform = `translateX(${trackPosition}px)`
+// //   }
+
+// //   animationId = requestAnimationFrame(updateMarquee)
+// // }
+
+const linkTypes = [
+  { key: "cv", label: "CV" },
+  { key: "website", label: "Web" },
+  { key: "socials", label: "Socials", nameWhenSingle: true },
+];
+
+const roster = members.map((member) => ({
+  ...member,
+  groups: linkTypes
+    .map((type) => {
+      const items = (member.links?.[type.key] ?? []).filter(
+        (link) => link.url && link.url !== "#",
+      );
+      const label =
+        type.nameWhenSingle && items.length === 1 ? items[0].name : type.label;
+      return { ...type, label, items };
+    })
+    .filter((group) => group.items.length > 0),
+}));
+
+//! Only one dropdown can be open at a time: { member: 'Name', key: 'github' } or null
+const openMenu = ref(null);
+
+const isMenuOpen = (member, key) =>
+  openMenu.value?.member === member.name && openMenu.value?.key === key;
+
+const toggleMenu = (member, key) => {
+  openMenu.value = isMenuOpen(member, key)
+    ? null
+    : { member: member.name, key };
+};
+
+const closeMenu = () => {
+  openMenu.value = null;
+};
+
+const menuItems = (member) => {
+  if (openMenu.value?.member !== member.name) return [];
+  return (
+    member.groups.find((group) => group.key === openMenu.value.key)?.items ?? []
+  );
+};
+
+const handleDocumentClick = (event) => {
+  if (!event.target.closest(".overlay-buttons")) closeMenu();
+};
+
+const handleKeydown = (event) => {
+  if (event.key === "Escape") closeMenu();
+};
+
+const maskedImages = ref({});
+
+const generateMaskedImages = async () => {
   for (const member of members) {
-    const rawUrl = (member.image && member.image !== '#') ? member.image : '/images/placeholder.png'
-    
+    const rawUrl =
+      member.image && member.image !== "#"
+        ? member.image
+        : "/images/placeholder.png";
+
     try {
-      const response = await fetch(rawUrl) //* RAWRRRRR
-      const blob = await response.blob()
-      
-      maskedImages.value[member.name] = URL.createObjectURL(blob)
+      const response = await fetch(rawUrl); //* RAWRRRRR
+      const blob = await response.blob();
+
+      maskedImages.value[member.name] = URL.createObjectURL(blob);
     } catch (error) {
-      console.error('Failed to mask image:', error)
+      console.error("Failed to mask image:", error);
     }
   }
-}
+};
 
-  const slideCarousel = (direction) => {
-    if (!carouselRef.value) return
-    
-    if (direction === 'prev') carouselInstance.prev()
-    if (direction === 'next') carouselInstance.next()
-  }
+const slideCarousel = (direction) => {
+  if (!carouselRef.value) return;
 
-  const easterEggMessage = ref(failsafeMessages[0])
+  if (direction === "prev") carouselInstance.prev();
+  if (direction === "next") carouselInstance.next();
+};
 
-  onMounted(() => {
-    OnDocumentLoad()
-    calculateLogScale()
-    checkMobileState()
-    fitBadgeText()
-    generateMaskedImages()
-    window.addEventListener('scroll', handleScroll)
-    window.addEventListener('resize', calculateLogScale)
-    document.addEventListener('click', handleDocumentClick)
-    document.addEventListener('keydown', handleKeydown)
+const easterEggMessage = ref(failsafeMessages[0]);
 
-    nextTick(() => {
-      if (carouselRef.value && hottestTools.value.length > 0) {
-        carouselInstance = Carousel(carouselRef.value, {
-          Navigation: true,
-          infinite: true,
-          center: true,
-          slidesPerPage: 'auto',
-          transition: 'slide',
-        })
-        carouselInstance.init()
-      }
-    })
+onMounted(() => {
+  OnDocumentLoad();
+  calculateLogScale();
+  checkMobileState();
+  fitBadgeText();
+  generateMaskedImages();
+  window.addEventListener("scroll", handleScroll);
+  window.addEventListener("resize", calculateLogScale);
+  document.addEventListener("click", handleDocumentClick);
+  document.addEventListener("keydown", handleKeydown);
 
-    const randomIndex = Math.floor(Math.random() * failsafeMessages.length)
-    easterEggMessage.value = failsafeMessages[randomIndex]  
-  })
+  nextTick(() => {
+    if (carouselRef.value && hottestTools.value.length > 0) {
+      carouselInstance = Carousel(carouselRef.value, {
+        Navigation: true,
+        infinite: true,
+        center: true,
+        slidesPerPage: "auto",
+        transition: "slide",
+      });
+      carouselInstance.init();
+    }
+  });
 
-  onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll)
-    window.removeEventListener('resize', calculateLogScale)
-    document.removeEventListener('click', handleDocumentClick)
-    document.removeEventListener('keydown', handleKeydown)
-    if (carouselInstance) carouselInstance.destroy()
-  })
+  const randomIndex = Math.floor(Math.random() * failsafeMessages.length);
+  easterEggMessage.value = failsafeMessages[randomIndex];
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+  window.removeEventListener("resize", calculateLogScale);
+  document.removeEventListener("click", handleDocumentClick);
+  document.removeEventListener("keydown", handleKeydown);
+  if (carouselInstance) carouselInstance.destroy();
+});
 </script>
 
 <template>
   <div class="app-wrapper">
     <RippleBackground :scrollOffset="scrollY" />
-    
+
     <div class="content-layer">
       <SiteHeader />
-      
+
       <main class="main-content">
         <div class="hero-container">
           <h1 class="hero-title">This is TiTilda</h1>
 
           <div class="spinning-badge">
             <svg viewBox="0 0 200 200" class="spinning-svg">
-              <path id="circlePath"
-              d="M100, 100 m -75, 0 a 75, 75 0 1,1 150,0 a 75,75 0 1,1 -150,0"
-              fill="none"
+              <path
+                id="circlePath"
+                d="M100, 100 m -75, 0 a 75, 75 0 1,1 150,0 a 75,75 0 1,1 -150,0"
+                fill="none"
               />
               <text>
-                <textPath href="#circlePath" startOffset="0">by students • for students •&nbsp;</textPath>
+                <textPath href="#circlePath" startOffset="0">
+                  by students • for students •&nbsp;
+                </textPath>
               </text>
             </svg>
           </div>
@@ -252,43 +274,79 @@
         <div class="hottest-tools-container">
           <div class="carousel-header">
             <h2 class="section-title flex-title">
-              <img src="/logos/flame.svg" alt="Flame icon" class="title-icon flame-icon" loading="lazy" />
+              <img
+                src="/logos/flame.svg"
+                alt="Flame icon"
+                class="title-icon flame-icon"
+                loading="lazy"
+              />
               Almost As Hot As You!
             </h2>
           </div>
 
           <div class="carousel-outer-wrapper">
-            
-            <button class="custom-nav-btn prev-btn" @click="slideCarousel('prev')" v-if="!isMobile && shouldScroll">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M11 5l-7 7 7 7" stroke="currentColor" fill="none" stroke-width="2"/><path d="M4 12h16" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+            <button
+              class="custom-nav-btn prev-btn"
+              @click="slideCarousel('prev')"
+              v-if="!isMobile && shouldScroll"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M11 5l-7 7 7 7"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-width="2"
+                />
+                <path
+                  d="M4 12h16"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-width="2"
+                />
+              </svg>
             </button>
 
             <div ref="carouselRef" class="f-carousel custom-carousel">
-              <div 
-                v-for="(tool, index) in hottestTools" 
+              <div
+                v-for="(tool, index) in hottestTools"
                 :key="`${tool.id}-${index}`"
                 class="f-carousel__slide"
               >
-                <div class="glass-card vertical-card" :class="tool.status === 'Live' ? 'active-tool' : 'locked-tool'">
-                  <div class="status-badge" :class="{ 'pending': tool.status !== 'Live' }">
+                <div
+                  class="glass-card vertical-card"
+                  :class="
+                    tool.status === 'Live' ? 'active-tool' : 'locked-tool'
+                  "
+                >
+                  <div
+                    class="status-badge"
+                    :class="{ pending: tool.status !== 'Live' }"
+                  >
                     {{ tool.status }}
                   </div>
-                  
+
                   <div class="card-content">
-                    <img 
-                      v-if="tool.logo && tool.logo !== '#'" 
+                    <img
+                      v-if="tool.logo && tool.logo !== '#'"
                       loading="lazy"
-                      :src="tool.logo.startsWith('/') ? tool.logo : '/' + tool.logo" 
-                      :alt="`${tool.name} logo`" 
-                      class="tool-logo" 
+                      :src="
+                        tool.logo.startsWith('/') ? tool.logo : '/' + tool.logo
+                      "
+                      :alt="`${tool.name} logo`"
+                      class="tool-logo"
                     />
                     <h3>{{ tool.name }}</h3>
                     <p>{{ tool.description }}</p>
                   </div>
-                  
-                  <a 
-                    v-if="tool.url && tool.status === 'Live'" 
-                    :href="tool.url" 
+
+                  <a
+                    v-if="tool.url && tool.status === 'Live'"
+                    :href="tool.url"
                     target="_blank"
                     class="card-action-btn"
                   >
@@ -298,14 +356,37 @@
               </div>
             </div>
 
-            <button class="custom-nav-btn next-btn" @click="slideCarousel('next')" v-if="!isMobile && shouldScroll">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M4 12h16" stroke="currentColor" fill="none" stroke-width="2"/><path d="M13 5l7 7-7 7" stroke="currentColor" fill="none" stroke-width="2"/></svg>
+            <button
+              class="custom-nav-btn next-btn"
+              @click="slideCarousel('next')"
+              v-if="!isMobile && shouldScroll"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M4 12h16"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-width="2"
+                />
+                <path
+                  d="M13 5l7 7-7 7"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-width="2"
+                />
+              </svg>
             </button>
-
           </div>
 
           <div class="see-all-wrapper">
-            <button class="see-all-btn" @click="isModalOpen = true">See All Tools &rarr;</button>
+            <button class="see-all-btn" @click="isModalOpen = true">
+              See All Tools &rarr;
+            </button>
           </div>
         </div>
 
@@ -313,34 +394,41 @@
           <div v-if="isModalOpen" class="tools-modal">
             <div class="modal-header">
               <h2>All Resources & Tools</h2>
-              <button class="close-btn" @click="isModalOpen = false">&times; Go Back</button>
+              <button class="close-btn" @click="isModalOpen = false">
+                &times; Go Back
+              </button>
             </div>
-            
+
             <div class="tools-grid">
-              <component 
-                :is="tool.url ? 'a' : 'div'" 
-                v-for="tool in toolsData" 
+              <component
+                :is="tool.url ? 'a' : 'div'"
+                v-for="tool in toolsData"
                 :key="tool.id"
                 :href="tool.url"
                 target="_blank"
-                class="glass-card horizontal-card" 
+                class="glass-card horizontal-card"
                 :class="tool.status === 'Live' ? 'active-tool' : 'locked-tool'"
               >
                 <div class="card-content">
-                  <img 
-                    v-if="tool.logo && tool.logo !== '#'" 
+                  <img
+                    v-if="tool.logo && tool.logo !== '#'"
                     loading="lazy"
-                    :src="tool.logo.startsWith('/') ? tool.logo : '/' + tool.logo" 
-                    :alt="`${tool.name} logo`" 
-                    class="tool-logo" 
+                    :src="
+                      tool.logo.startsWith('/') ? tool.logo : '/' + tool.logo
+                    "
+                    :alt="`${tool.name} logo`"
+                    class="tool-logo"
                   />
                   <h3>{{ tool.name }}</h3>
                   <!-- <p>{{ tool.description }}</p> -->
                 </div>
-                <div class="status-badge" :class="{ 'pending': tool.status !== 'Live' }">
+                <div
+                  class="status-badge"
+                  :class="{ pending: tool.status !== 'Live' }"
+                >
                   {{ tool.status }}
                 </div>
-                
+
                 <div class="fly-in-text" v-if="tool.status === 'Live'">
                   View Resource &raquo;
                 </div>
@@ -352,25 +440,41 @@
 
       <section class="glass-section roster-section">
         <h2 class="section-title layered-title">
-          <img src="/logos/heisenberg.svg" alt="Heisenberg icon" class="title-icon heisenberg-icon" loading="lazy" />
-          <span style="-webkit-text-stroke: 2px black; paint-order: stroke fill;">Say Our Names</span>
+          <img
+            src="/logos/heisenberg.svg"
+            alt="Heisenberg icon"
+            class="title-icon heisenberg-icon"
+            loading="lazy"
+          />
+          <span style="-webkit-text-stroke: 2px black; paint-order: stroke fill"
+            >Say Our Names</span
+          >
         </h2>
         <div class="roster-grid">
-          <div v-for="member in roster" :key="member.name" class="member-card" @mouseleave="closeMenu">
-            <div 
-                class="member-image-mask"
-                :style="{ backgroundImage: maskedImages[member.name] ? `url(${maskedImages[member.name]})` : 'none' }"
-                @contextmenu.prevent
-              ></div>
-              
-              <span class="member-info">
-                <h3>{{ member.name }}</h3>
-              </span>
+          <div
+            v-for="member in roster"
+            :key="member.name"
+            class="member-card"
+            @mouseleave="closeMenu"
+          >
+            <div
+              class="member-image-mask"
+              :style="{
+                backgroundImage: maskedImages[member.name]
+                  ? `url(${maskedImages[member.name]})`
+                  : 'none',
+              }"
+              @contextmenu.prevent
+            ></div>
+
+            <span class="member-info">
+              <h3>{{ member.name }}</h3>
+            </span>
             <div class="member-links-overlay">
               <div class="overlay-description">
                 <p v-html="member.description"></p>
               </div>
-              
+
               <div class="overlay-buttons">
                 <template v-for="group in member.groups" :key="group.key">
                   <a
@@ -379,7 +483,8 @@
                     target="_blank"
                     rel="noopener"
                     class="link-btn"
-                  >{{ group.label }}</a>
+                    >{{ group.items[0].name }}</a
+                  >
 
                   <button
                     v-else
@@ -389,13 +494,30 @@
                     aria-haspopup="true"
                     :aria-expanded="isMenuOpen(member, group.key)"
                     @click="toggleMenu(member, group.key)"
-                  >{{ group.label }} <span class="chevron">&#9662;</span></button>
+                  >
+                    {{ group.label }} <span class="chevron">&#9662;</span>
+                  </button>
                 </template>
 
                 <Transition name="menu-fade">
-                  <ul v-if="menuItems(member).length" class="link-menu" role="menu">
-                    <li v-for="item in menuItems(member)" :key="item.url" role="none">
-                      <a :href="item.url" target="_blank" rel="noopener" role="menuitem" @click="closeMenu">{{ item.name }}</a>
+                  <ul
+                    v-if="menuItems(member).length"
+                    class="link-menu"
+                    role="menu"
+                  >
+                    <li
+                      v-for="item in menuItems(member)"
+                      :key="item.url"
+                      role="none"
+                    >
+                      <a
+                        :href="item.url"
+                        target="_blank"
+                        rel="noopener"
+                        role="menuitem"
+                        @click="closeMenu"
+                        >{{ item.name }}</a
+                      >
                     </li>
                   </ul>
                 </Transition>
@@ -404,7 +526,6 @@
           </div>
         </div>
       </section>
-
     </div>
     <div class="squish-failsafe">
       <h2>{{ easterEggMessage.title }}</h2>
@@ -413,8 +534,8 @@
     </div>
 
     <footer class="site-footer">
-        <p>Designed with &#x2764; by Nadav Moscovici</p>
-        <p>TiTilda &copy; 2022 - {{ currentYear }}</p>
+      <p>Designed with &#x2764; by Nadav Moscovici</p>
+      <p>TiTilda &copy; 2022 - {{ currentYear }}</p>
     </footer>
   </div>
 </template>
@@ -424,11 +545,14 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    sans-serif;
 }
 
 :root {
-  --log-scale: 1; 
+  --log-scale: 1;
   overscroll-behavior: none;
 }
 
@@ -447,7 +571,9 @@ body {
   }
 }
 
-a, button, img {
+a,
+button,
+img {
   -webkit-user-drag: none;
   user-select: none;
   -webkit-user-select: none;
@@ -480,7 +606,7 @@ img {
 }
 
 .main-content {
-  min-height: calc(100vh - 100px); 
+  min-height: calc(100vh - 100px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -500,7 +626,7 @@ img {
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  margin-top: -10vh; 
+  margin-top: -10vh;
 }
 
 .hero-title {
@@ -510,7 +636,9 @@ img {
   text-align: center;
   color: #ffffff;
   margin: 0;
-  text-shadow: 0 0 4px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.3);
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 0.5),
+    0 0 10px rgba(255, 255, 255, 0.3);
   cursor: default;
 }
 
@@ -528,7 +656,7 @@ img {
   text {
     font-size: 18px;
     font-weight: 700;
-    fill: #fff; 
+    fill: #fff;
     letter-spacing: 3.5px;
     text-transform: uppercase;
 
@@ -537,7 +665,7 @@ img {
     paint-order: stroke fill;
     stroke-linejoin: round;
 
-     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
   }
 }
 
@@ -546,7 +674,7 @@ img {
   max-width: 1200px;
   margin: 0 auto;
 
-  @media (max-width: 768px){
+  @media (max-width: 768px) {
     padding: 4rem 1.25rem;
   }
 }
@@ -564,8 +692,7 @@ img {
   }
 }
 
-.flex-title
-{
+.flex-title {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -574,7 +701,8 @@ img {
 .flame-icon {
   width: 2.8rem;
   height: auto;
-  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7495%) hue-rotate(139deg) brightness(98%) contrast(100%);
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7495%)
+    hue-rotate(139deg) brightness(98%) contrast(100%);
 }
 
 .tools-section {
@@ -582,7 +710,7 @@ img {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: center; 
+  align-items: center;
   padding-top: 11vh;
   user-select: none;
 }
@@ -600,7 +728,7 @@ img {
   justify-content: center;
   align-items: center;
   margin-bottom: 2rem;
-  
+
   .section-title {
     margin-bottom: 0;
   }
@@ -610,7 +738,7 @@ img {
   position: relative;
   max-width: 69.25rem;
   margin: 0 auto;
-  padding: 0 4rem; 
+  padding: 0 4rem;
 }
 
 .custom-nav-btn {
@@ -628,28 +756,32 @@ img {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  
-  z-index: 999; 
+
+  z-index: 999;
 
   &:hover {
     background: #00e5ff;
     color: #000;
   }
 
-  &.prev-btn { left: 0; }
-  &.next-btn { right: 0; }
+  &.prev-btn {
+    left: 0;
+  }
+  &.next-btn {
+    right: 0;
+  }
 }
 
 .custom-carousel {
   width: 100%;
-  
+
   --f-carousel-gap: 1rem;
   --f-carousel-slide-width: calc((100% - 1rem) / 3);
 
   .f-carousel__viewport {
-    padding: 1.5rem 0; 
-    margin: -1.5rem 0; 
-    overflow: visible;     
+    padding: 1.5rem 0;
+    margin: -1.5rem 0;
+    overflow: visible;
   }
 
   .f-carousel__nav {
@@ -667,7 +799,7 @@ img {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; 
+  justify-content: flex-end;
   position: relative;
 }
 
@@ -677,12 +809,12 @@ img {
     max-width: 100vw;
     left: 50%;
     transform: translateX(-50%);
-    
-    padding: 0; 
+
+    padding: 0;
   }
 
   .custom-carousel {
-    --f-carousel-slide-width: 16.5rem; 
+    --f-carousel-slide-width: 16.5rem;
     --f-carousel-gap: 1rem;
   }
 }
@@ -701,7 +833,7 @@ img {
 // //   justify-content: center;
 // //   transition: all 0.2s ease;
 // //   user-select: none;
-  
+
 // //   &:hover {
 // //     background: #00e5ff;
 // //     color: #000;
@@ -709,7 +841,6 @@ img {
 // // }
 
 .vertical-card {
-  
   .card-content {
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     h3 {
@@ -721,11 +852,11 @@ img {
   .status-badge {
     position: absolute;
     top: 1.5rem;
-    left: 1.5rem; 
+    left: 1.5rem;
     right: auto;
   }
 
-.card-action-btn {
+  .card-action-btn {
     position: absolute;
     bottom: 2rem;
     left: 2rem;
@@ -748,7 +879,7 @@ img {
     }
     .card-action-btn {
       opacity: 1;
-      transform: translateY(0); 
+      transform: translateY(0);
     }
   }
 }
@@ -768,13 +899,15 @@ img {
   cursor: pointer;
   padding: 0.5rem 1rem;
   transition: opacity 0.2s;
-  
-  &:hover { opacity: 0.7; }
+
+  &:hover {
+    opacity: 0.7;
+  }
 }
 
 .tools-modal {
   position: fixed;
-  inset: 0; 
+  inset: 0;
   background: rgba(11, 2, 23, 0.95);
   backdrop-filter: blur(20px);
   z-index: 1000;
@@ -792,8 +925,10 @@ img {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 4rem;
-  
-  h2 { font-size: 2.5rem; }
+
+  h2 {
+    font-size: 2.5rem;
+  }
 }
 
 .close-btn {
@@ -805,7 +940,7 @@ img {
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: #fff;
     color: #000;
@@ -820,7 +955,7 @@ img {
 .expand-enter-from,
 .expand-leave-to {
   opacity: 0;
-  transform: scale(0.95); 
+  transform: scale(0.95);
 }
 
 .tools-grid {
@@ -841,9 +976,11 @@ img {
   padding: 2rem;
   text-decoration: none;
   color: #fff;
-  transition: transform 0.3s ease, background 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
   overflow: hidden;
-  
+
   @media (max-width: 768px) {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -857,7 +994,7 @@ img {
   }
 }
 
-.horizontal-card {  
+.horizontal-card {
   .fly-in-text {
     position: absolute;
     right: 2rem;
@@ -883,7 +1020,7 @@ img {
   height: 3rem;
   object-fit: contain;
   margin-bottom: 1rem;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); 
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
 }
 
 .locked-tool {
@@ -901,7 +1038,7 @@ img {
   font-weight: 700;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
-  
+
   &.pending {
     background: rgba(255, 255, 255, 0.2);
     color: #fff;
@@ -911,19 +1048,20 @@ img {
 .layered-title {
   position: relative;
   display: inline-block;
-  z-index: 1; 
+  z-index: 1;
 }
 
 .heisenberg-icon {
   position: absolute;
   width: 7rem;
   height: auto;
-  left: -5rem; 
-  top: -2rem; 
+  left: -5rem;
+  top: -2rem;
   z-index: -1;
   transform: rotate(15deg);
   opacity: 0.8;
-  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7495%) hue-rotate(139deg) brightness(98%) contrast(100%);
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7495%)
+    hue-rotate(139deg) brightness(98%) contrast(100%);
 }
 
 .roster-section {
@@ -933,7 +1071,7 @@ img {
 }
 
 .roster-section::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 50%;
@@ -948,7 +1086,7 @@ img {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
-  justify-content: center; 
+  justify-content: center;
   width: 100%;
 }
 
@@ -957,13 +1095,13 @@ img {
   border-radius: 12px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.4);
-  
+
   width: 13.75rem;
   height: calc(13.75rem * (4 / 3));
   flex-shrink: 0;
-  
+
   &:hover .member-links-overlay {
-    transform: translateY(0); 
+    transform: translateY(0);
   }
 }
 
@@ -991,10 +1129,16 @@ img {
   left: 0;
   width: 100%;
   padding: 1.5rem 1rem 1rem;
-  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-  
-  h3 { font-size: 1.1rem; margin-bottom: 0.2rem; }
-  p { font-size: 0.85rem; color: #aaa; }
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+  }
+  p {
+    font-size: 0.85rem;
+    color: #aaa;
+  }
 }
 
 .member-links-overlay {
@@ -1005,11 +1149,11 @@ img {
   height: 105%;
   background: rgba(11, 2, 23, 0.85);
   backdrop-filter: blur(8px);
-  
+
   display: flex;
-  flex-direction: column; 
-  
-  transform: translateY(100%); 
+  flex-direction: column;
+
+  transform: translateY(100%);
   transition: transform 0.4s ease-in-out;
 
   @media (max-width: 768px) {
@@ -1026,20 +1170,20 @@ img {
   padding: 1.5rem;
   text-align: center;
   user-select: text;
-  
+
   p {
     font-size: 0.95rem;
     line-height: 1.5;
     color: #ffffff;
     white-space: pre-line;
-    
+
     //? Wanted to limit to 150 chars
     //? Line breaks were an issue though
     //? 7 lines is exactly 150 chars
     //? Spaces included
     display: -webkit-box;
     line-clamp: 7;
-    -webkit-line-clamp: 7; 
+    -webkit-line-clamp: 7;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: clip;
@@ -1066,7 +1210,7 @@ img {
   font-size: 0.8rem;
   text-decoration: none;
   font-weight: 600;
-  
+
   &:hover {
     background: #00e5ff;
     color: #000;
@@ -1091,7 +1235,9 @@ img {
       color: #000;
       border-color: #00e5ff;
 
-      .chevron { transform: rotate(180deg); }
+      .chevron {
+        transform: rotate(180deg);
+      }
     }
   }
 }
@@ -1128,7 +1274,9 @@ img {
 
 .menu-fade-enter-active,
 .menu-fade-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
 .menu-fade-enter-from,
@@ -1149,13 +1297,13 @@ img {
   text-align: center;
   padding: 2rem;
   color: #fff;
-  
+
   h2 {
     color: #00e5ff;
     font-size: 2rem;
     margin-bottom: 1rem;
   }
-  
+
   p {
     font-size: 1rem;
     color: #aaa;
@@ -1172,9 +1320,9 @@ img {
 
 @media (max-width: 300px) {
   .content-layer {
-    display: none !important; 
+    display: none !important;
   }
-  
+
   .squish-failsafe {
     display: flex;
   }
@@ -1195,7 +1343,7 @@ img {
   z-index: 10;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 50%;
@@ -1205,14 +1353,14 @@ img {
     background: #000000;
     z-index: -1;
   }
-  
+
   p {
     color: rgba(255, 255, 255, 0.5);
     font-size: 0.9rem;
     font-weight: 500;
     margin: 0;
     transition: color 0.2s ease;
-    
+
     &:hover {
       color: rgba(255, 255, 255, 0.8);
     }
@@ -1220,12 +1368,20 @@ img {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes jitter {
-  0% { transform: rotate(-10deg) translateX(-5px); }
-  100% { transform: rotate(10deg) translateX(5px); }
+  0% {
+    transform: rotate(-10deg) translateX(-5px);
+  }
+  100% {
+    transform: rotate(10deg) translateX(5px);
+  }
 }
 </style>
