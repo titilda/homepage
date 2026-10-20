@@ -129,13 +129,35 @@
     "name": "Emanuel Mihali",
     "description": "",
     "image": "#",
-    "links": {}
+    "links": {
+      "socials": [
+        {
+          "name": "LinkedIn",
+          "url": "https://www.linkedin.com/in/emanuel-mihali/"
+        },
+        {
+          "name": "Instagram",
+          "url": "https://www.instagram.com/emanuelus/"
+        }
+      ]
+    }
   },
   {
     "name": "Federica Sofia Paris",
     "description": "",
     "image": "#",
-    "links": {}
+    "links": {
+      "socials": [
+        {
+          "name": "LinkedIn",
+          "url": "https://www.linkedin.com/in/federica-sofia-paris-696323338/"
+        },
+        {
+          "name": "Instagram",
+          "url": "https://www.instagram.com/fedeparis._/"
+        }
+      ]
+    }
   },
   {
     "name": "Antonio La Montagna",
@@ -145,7 +167,7 @@
   },
   {
     "name": "Simone Orbon",
-    "description": "",
+    "description": "CSE AI track master Student @ PoliMi",
     "image": "#",
     "links": {}
   },
