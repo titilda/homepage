@@ -131,19 +131,23 @@ const linkTypes = [
   { key: "socials", label: "Socials", nameWhenSingle: true },
 ];
 
-const roster = members.map((member) => ({
-  ...member,
-  groups: linkTypes
-    .map((type) => {
-      const items = (member.links?.[type.key] ?? []).filter(
-        (link) => link.url && link.url !== "#",
-      );
-      const label =
-        type.nameWhenSingle && items.length === 1 ? items[0].name : type.label;
-      return { ...type, label, items };
-    })
-    .filter((group) => group.items.length > 0),
-}));
+const roster = members
+  .map((member) => ({
+    ...member,
+    groups: linkTypes
+      .map((type) => {
+        const items = (member.links?.[type.key] ?? []).filter(
+          (link) => link.url && link.url !== "#",
+        );
+        const label =
+          type.nameWhenSingle && items.length === 1
+            ? items[0].name
+            : type.label;
+        return { ...type, label, items };
+      })
+      .filter((group) => group.items.length > 0),
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name));
 
 //! Only one dropdown can be open at a time: { member: 'Name', key: 'github' } or null
 const openMenu = ref(null);
@@ -261,8 +265,8 @@ onUnmounted(() => {
                 fill="none"
               />
               <text>
-                <textPath href="#circlePath" startOffset="0">
-                  by students • for students •&nbsp;
+                <textPath href="#circlePath" startOffset="0" dx="15">
+                  by students • for students •
                 </textPath>
               </text>
             </svg>
@@ -891,13 +895,15 @@ img {
 }
 
 .see-all-btn {
-  background: transparent;
-  color: #00e5ff;
+  background: #00e5ff;
+  color: #000;
   border: none;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
   padding: 0.5rem 1rem;
+  opacity: 1;
   transition: opacity 0.2s;
 
   &:hover {
@@ -938,6 +944,7 @@ img {
   padding: 0.5rem 1.5rem;
   border-radius: 8px;
   font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
 
