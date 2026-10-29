@@ -1152,15 +1152,15 @@ img {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 105%;
+  width: 105%;
+  height: 110%;
   background: rgba(11, 2, 23, 0.85);
   backdrop-filter: blur(8px);
 
   display: flex;
   flex-direction: column;
 
-  transform: translateY(100%);
+  transform: translateY(105%);
   transition: transform 0.4s ease-in-out;
 
   @media (max-width: 768px) {
@@ -1336,6 +1336,7 @@ img {
 }
 
 .site-footer {
+  margin-top: -1px;
   position: relative;
   width: 100%;
   user-select: none;
@@ -1348,17 +1349,19 @@ img {
   padding: 4rem 2rem 2rem;
   text-align: center;
   z-index: 10;
+  overflow: visible !important;
 
   &::before {
     content: "";
     position: absolute;
-    top: 0;
+    top: -1rem;
     left: 50%;
     transform: translateX(-50%);
     width: 100vw;
-    height: 100%;
+    height: calc(100% + 4rem);
     background: #000000;
     z-index: -1;
+    box-shadow: 0 1000rem 0 0 #000000;
   }
 
   p {
