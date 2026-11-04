@@ -87,7 +87,7 @@
     "description": "CS student @ PoliMi",
     "image": "/images/andrea2.png",
     "links": {
-      "website": [{ "name": "website", "url": "https://xeda.me" }],
+      "website": [{ "name": "Website", "url": "https://xeda.me" }],
       "socials": [
         { "name": "github", "url": "https://github.com/XedaGmr" },
         {

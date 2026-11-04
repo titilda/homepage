@@ -483,7 +483,8 @@ onUnmounted(() => {
             </span>
             <div class="member-links-overlay">
               <div class="overlay-description">
-                <p v-html="member.description"></p>
+                <p v-if="member.description?.trim()" v-html="member.description"></p>
+                <p v-else><b>{{ member.name }}</b></p>
               </div>
 
               <div class="overlay-buttons">
