@@ -7,30 +7,30 @@
       "cv": [
         {
           "name": "CV",
-          "url": "https://www.nadavmoscovici.com/files/nadav_moscovici_cv.pdf"
-        }
+          "url": "https://www.nadavmoscovici.com/files/nadav_moscovici_cv.pdf",
+        },
       ],
       "website": [
         {
           "name": "Website",
-          "url": "https://www.nadavmoscovici.com"
-        }
+          "url": "https://www.nadavmoscovici.com",
+        },
       ],
       "socials": [
         {
           "name": "Instagram",
-          "url": "https://www.instagram.com/unclenadu/"
+          "url": "https://www.instagram.com/unclenadu/",
         },
         {
           "name": "GitHub",
-          "url": "https://github.com/CrawlingWharf90"
+          "url": "https://github.com/CrawlingWharf90",
         },
         {
           "name": "LinkedIn",
-          "url": "https://www.linkedin.com/in/nadav-moscovici-465185214/"
-        }
-      ]
-    }
+          "url": "https://www.linkedin.com/in/nadav-moscovici-465185214/",
+        },
+      ],
+    },
   },
   {
     "name": "Alessandro Modica",
@@ -40,24 +40,24 @@
       "website": [
         {
           "name": "Website",
-          "url": "https://modica.io"
-        }
+          "url": "https://modica.io",
+        },
       ],
       "socials": [
         {
           "name": "Instagram",
-          "url": "https://www.instagram.com/modica.io/"
+          "url": "https://www.instagram.com/modica.io/",
         },
         {
           "name": "GitHub",
-          "url": "https://github.com/TheManchineel"
+          "url": "https://github.com/TheManchineel",
         },
         {
           "name": "LinkedIn",
-          "url": "https://www.linkedin.com/in/alessandro-modica/"
-        }
-      ]
-    }
+          "url": "https://www.linkedin.com/in/alessandro-modica/",
+        },
+      ],
+    },
   },
   {
     "name": "Andrea Oggioni",
@@ -67,26 +67,37 @@
       "website": [
         {
           "name": "Website",
-          "url": "https://etabeta1.github.io"
-        }
+          "url": "https://etabeta1.github.io",
+        },
       ],
       "socials": [
         {
           "name": "GitHub",
-          "url": "https://github.com/etabeta1"
+          "url": "https://github.com/etabeta1",
         },
         {
           "name": "LinkedIn",
-          "url": "https://www.linkedin.com/in/oggioniandrea"
-        }
-      ]
-    }
+          "url": "https://www.linkedin.com/in/oggioniandrea",
+        },
+      ],
+    },
   },
   {
     "name": "Andrea Lunghi",
-    "description": "",
+    "description": "CS student @ PoliMi",
     "image": "/images/andrea2.png",
-    "links": {}
+    "links": {
+      "website": [{ "name": "website", "url": "https://xeda.me" }],
+      "socials": [
+        { "name": "github", "url": "https://github.com/XedaGmr" },
+        {
+          "name": "linkedin",
+          "url": "https://www.linkedin.com/in/lunghi-andrea/",
+        },
+        { "name": "x", "url": "https://twitter.com/XedaGmr" },
+        { "name": "dev.to", "url": "https://dev.to/xeda" },
+      ],
+    },
   },
   {
     "name": "Joele Andrea Ortore",
@@ -96,34 +107,34 @@
       "socials": [
         {
           "name": "GitHub",
-          "url": "https://github.com/AlastorCoder23"
-        }
-      ]
-    }
+          "url": "https://github.com/AlastorCoder23",
+        },
+      ],
+    },
   },
   {
     "name": "Niccolo Papini",
     "description": "",
     "image": "/images/niccolo.png",
-    "links": {}
+    "links": {},
   },
   {
     "name": "Mattia Martinelli",
     "description": "",
     "image": "#",
-    "links": {}
+    "links": {},
   },
-  {
-    "name": "Alessio Perini",
-    "description": "",
-    "image": "#",
-    "links": {}
-  },
+  // // {
+  // //   "name": "Alessio Perini",
+  // //   "description": "",
+  // //   "image": "#",
+  // //   "links": {},
+  // // },
   {
     "name": "Alexandru Nechita",
     "description": "",
     "image": "#",
-    "links": {}
+    "links": {},
   },
   {
     "name": "Emanuel Mihali",
@@ -133,14 +144,14 @@
       "socials": [
         {
           "name": "LinkedIn",
-          "url": "https://www.linkedin.com/in/emanuel-mihali/"
+          "url": "https://www.linkedin.com/in/emanuel-mihali/",
         },
         {
           "name": "Instagram",
-          "url": "https://www.instagram.com/emanuelus/"
-        }
-      ]
-    }
+          "url": "https://www.instagram.com/emanuelus/",
+        },
+      ],
+    },
   },
   {
     "name": "Federica Sofia Paris",
@@ -150,26 +161,26 @@
       "socials": [
         {
           "name": "LinkedIn",
-          "url": "https://www.linkedin.com/in/federica-sofia-paris-696323338/"
+          "url": "https://www.linkedin.com/in/federica-sofia-paris-696323338/",
         },
         {
           "name": "Instagram",
-          "url": "https://www.instagram.com/fedeparis._/"
-        }
-      ]
-    }
+          "url": "https://www.instagram.com/fedeparis._/",
+        },
+      ],
+    },
   },
   {
     "name": "Antonio La Montagna",
     "description": "",
     "image": "#",
-    "links": {}
+    "links": {},
   },
   {
     "name": "Simone Orbon",
     "description": "CSE AI track master Student @ PoliMi",
     "image": "#",
-    "links": {}
+    "links": {},
   },
   {
     "name": "Michele Mantione",
@@ -179,13 +190,19 @@
       "socials": [
         {
           "name": "Instagram",
-          "url": "https://www.instagram.com/m.miklee"
+          "url": "https://www.instagram.com/m.miklee",
         },
         {
           "name": "GitHub",
-          "url": "https://github.com/mMichele03"
-        }
-      ]
-    }
-  }
+          "url": "https://github.com/mMichele03",
+        },
+      ],
+    },
+  },
+  // // {
+  // //   "name": "Matteo Lunghi",
+  // //   "description": "",
+  // //   "image": "",
+  // //   "links": {},
+  // // },
 ]

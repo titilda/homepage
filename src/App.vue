@@ -2,9 +2,9 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
 import RippleBackground from "./components/RippleBackground.vue";
 import SiteHeader from "./components/SiteHeader.vue";
-import failsafeMessages from "./data/easter-egg.json";
-import toolsData from "./data/tools.json";
-import members from "./data/members.json";
+import failsafeMessages from "./data/easter-egg.jsonc";
+import toolsData from "./data/tools.jsonc";
+import members from "./data/members.jsonc";
 import { Carousel } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/carousel/carousel.css";
 
@@ -40,6 +40,7 @@ const calculateLogScale = () => {
 };
 
 const OnDocumentLoad = () => {
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   window.scrollTo(0, 0);
 };
 
@@ -58,8 +59,14 @@ const fitBadgeText = () => {
 };
 
 const scrollY = ref(0);
+let scrollTicking = false;
 const handleScroll = () => {
-  scrollY.value = window.scrollY;
+  if (scrollTicking) return;
+  scrollTicking = true;
+  requestAnimationFrame(() => {
+    scrollY.value = window.scrollY;
+    scrollTicking = false;
+  });
 };
 
 const isModalOpen = ref(false);
@@ -215,7 +222,7 @@ onMounted(() => {
   checkMobileState();
   fitBadgeText();
   generateMaskedImages();
-  window.addEventListener("scroll", handleScroll);
+  window.addEventListener("scroll", handleScroll, { passive: true });
   window.addEventListener("resize", calculateLogScale);
   document.addEventListener("click", handleDocumentClick);
   document.addEventListener("keydown", handleKeydown);
@@ -563,16 +570,16 @@ onUnmounted(() => {
 html {
   font-size: calc(16px * var(--log-scale));
   overflow-x: hidden;
+
+  //! Lock the page scroll while the modal is open (must be on html, not body)
+  &:has(.tools-modal) {
+    overflow: hidden;
+  }
 }
 
 body {
   background-color: #000;
   color: #fff;
-  overflow-x: hidden;
-
-  &:has(.tools-modal) {
-    overflow: hidden;
-  }
 }
 
 a,
@@ -590,7 +597,8 @@ img {
 .app-wrapper {
   position: relative;
   min-height: 100vh;
-  overflow-x: hidden;
+  //! clip (not hidden): hidden turns this into a nested scroll container
+  overflow: clip;
   width: 100%;
 }
 
@@ -919,6 +927,7 @@ img {
   z-index: 1000;
   padding: 4rem;
   overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1104,7 +1113,8 @@ img {
   background: rgba(0, 0, 0, 0.4);
 
   width: 13.75rem;
-  height: calc(13.75rem * (4 / 3));
+  max-width: 100%;
+  aspect-ratio: 3 / 4;
   flex-shrink: 0;
 
   &:hover .member-links-overlay {
@@ -1152,15 +1162,15 @@ img {
   position: absolute;
   top: 0;
   left: 0;
-  width: 105%;
-  height: 110%;
+  width: 100%;
+  height: 100%;
   background: rgba(11, 2, 23, 0.85);
   backdrop-filter: blur(8px);
 
   display: flex;
   flex-direction: column;
 
-  transform: translateY(105%);
+  transform: translateY(101%);
   transition: transform 0.4s ease-in-out;
 
   @media (max-width: 768px) {
@@ -1170,11 +1180,13 @@ img {
 }
 
 .overlay-description {
-  height: 70%;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 1.5rem;
+  align-items: safe center;
+  overflow-y: auto;
+  padding: 1rem 1rem 0.5rem;
   text-align: center;
   user-select: text;
 
@@ -1199,13 +1211,13 @@ img {
 
 .overlay-buttons {
   position: relative;
-  height: 30%;
+  flex: none;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
   gap: 0.5rem;
-  padding: 0 1.5rem 1.5rem;
+  padding: 0.5rem 1rem 1rem;
 }
 
 .link-btn {
@@ -1358,10 +1370,9 @@ img {
     left: 50%;
     transform: translateX(-50%);
     width: 100vw;
-    height: calc(100% + 4rem);
+    height: calc(100% + 1rem);
     background: #000000;
     z-index: -1;
-    box-shadow: 0 1000rem 0 0 #000000;
   }
 
   p {
