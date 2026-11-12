@@ -116,7 +116,28 @@
     "name": "Niccolo Papini",
     "description": "",
     "image": "/images/niccolo.png",
-    "links": {},
+    "links": {
+       "cv": [
+        {
+          "name": "CV",
+          "url": "https://ilgrandedumbo.github.io/personal_cv/main.pdf",
+        },
+      ],
+      "socials": [
+        {
+          "name": "Instagram",
+          "url": "https://www.instagram.com/nicco_papini/",
+        },
+        {
+          "name": "GitHub",
+          "url": "https://github.com/ilgrandedumbo",
+        },
+        {
+          "name": "LinkedIn",
+          "url": "https://www.linkedin.com/in/niccolo-papini/",
+        },
+      ],
+    },
   },
   {
     "name": "Mattia Martinelli",
