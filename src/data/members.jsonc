@@ -117,6 +117,12 @@
     "description": "",
     "image": "/images/niccolo.png",
     "links": {
+       "cv": [
+        {
+          "name": "CV",
+          "url": "https://ilgrandedumbo.github.io/personal_cv/main.pdf",
+        },
+      ],
       "socials": [
         {
           "name": "Instagram",
